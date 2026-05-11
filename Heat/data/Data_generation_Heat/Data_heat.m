@@ -2,15 +2,15 @@ close all
 clear
 clc
 
-% See An Introduction to Computational Stochastic PDEs 
+% See An Introduction to Computational Stochastic PDEs
 % - by Gabriel J. Lord, Catherine E. Powell, Tony Shardlow
 
 rng(0)
 
 % Domain:
-a=20; 
+a=20;
 J=64;
-x=(0:a/J:a)'; 
+x=(0:a/J:a)';
 
 % Initial condition:
 u0 = sin(x);
@@ -35,7 +35,7 @@ dt= T/N;
 xdt = (1/dt)*mean(y,3);
 xdiff = (1/dt)*mean(y.*y,3);
 
-% save('Review_heat_dx_64m_500t.mat', 'xdt', 'xdiff', 'sol')
+save('../Heat_dx_64m_500t.mat', 'xdt', 'xdiff', 'sol')
 
 %%
 figure();
