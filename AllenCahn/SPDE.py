@@ -18,6 +18,7 @@ from scipy.special import loggamma
 
 
 def sindy(lam, D, dxdt, iteration=10):
+    # literally just sindy via STLS. Start with LSTQ, , then iteratively throw away small coeffs
     Xi = np.matmul(np.linalg.pinv(D), dxdt.T)  # initial guess: Least-squares
     for k in range(iteration):
         smallinds = np.where(abs(Xi) < lam)  # find small coefficients
@@ -27,7 +28,7 @@ def sindy(lam, D, dxdt, iteration=10):
             # Regress dynamics onto remaining terms to find sparse Xi
             Xi[biginds, ind] = np.matmul(
                 np.linalg.pinv(D[:, biginds[0]]), dxdt[ind, :].T
-            )
+            )  # though this isn't using an sparsity penalty, which is kind of surprising - though i think that's actually the same as Boninsegna's that they copy.
     return Xi
 
 
@@ -38,7 +39,7 @@ def Lasso(X0, Y, lam, w=None, maxit=100, normalize=2):
     Minimises:
         (1/2)||X w - Y||_2^2 + lam ||w||_1
     """
-
+    # straightforward lasso solution to a system
     # sizes
     n, d = X0.shape
 
@@ -140,7 +141,7 @@ def FiniteDiff(u, dx, d):
         return ux
 
     if d > 3:
-        return FiniteDiff(FiniteDiff(u, dx, 3), dx, d - 3)
+        return FiniteDiff(FiniteDiff(u, dx, 3), dx, d - 3)  # recursive finite diff code
 
 
 def build_linear_system(
@@ -156,7 +157,7 @@ def build_linear_system(
     deg_x=5,
     deg_t=None,
     sigma=2,
-):
+):  # library dictionary construction
     """
     Constructs a large linear system to use in later regression for finding PDE.
     This function works when we are not subsampling the data or adding in any forcing.
@@ -206,7 +207,9 @@ def build_linear_system(
     # First take the time derivaitve for the left hand side of the equation
     ########################
     ut = np.zeros((n2, m2), dtype=np.float64)
-    for i in range(n2):
+    for i in range(
+        n2
+    ):  # generalised sindy solution - the real target in stochastic systems is the KM coeffs
         ut[i, :] = FiniteDiff(u[i + offset_x, :], dt, 1)
 
     ut = np.reshape(ut, (n2 * m2, 1), order="F")
@@ -252,6 +255,7 @@ def build_linear_system(
 
 
 def print_pde(w, rhs_description, ut="u_t"):
+    # prints pde
     pde = ut + " = "
     first = True
     for i in range(len(w)):
@@ -269,23 +273,26 @@ def print_pde(w, rhs_description, ut="u_t"):
 
 
 def Variational_Bayes_Code(X, y, initz0, tol, verbosity):
+    # a realisation of the paper's algorithm
     if len(X) == 0 or len(y) == 0:
         raise Exception("X and or y is missing")
 
     if len(X) != len(y):
         raise Exception("Number of observations do not match")
 
-    N = len(X)
+    N = len(X)  # number of observations
     # Prior parameters of noise variance (Inverse Gamma dist)
-    A = 1e-4
+    A = 1e-4  # for the IG prior on noise
     B = 1e-4
-    vs = 10
-    tau0 = 1000
+    vs = 10  # this is for the slab variance - basically slab coefficients are probably between -10 and 10
+    tau0 = 1000  # results in quite a small initial supposed noise variance but it changes quite a lot so...
 
     if len(initz0) == 0:
         raise Exception("No initial value of z found")
     else:
-        p0 = expit(-0.5 * (np.sqrt(N)))
+        p0 = expit(
+            -0.5 * (np.sqrt(N))
+        )  # conveys the intuition that if you have more data you can be more certain about specific terms. [think about its relation to N as N->big number]
 
         # Adding the intercept indicator variable (slightly less than 1 to prevent log(0) values)
         # initz = np.hstack((1,initz0))
@@ -293,7 +300,7 @@ def Variational_Bayes_Code(X, y, initz0, tol, verbosity):
         DS, LLcvg = run_VB2(X, y, vs, A, B, tau0, p0, initz, tol, verbosity)
 
     out_vb = DS
-    a = DS["zmean"] > 0.5
+    a = DS["zmean"] > 0.5  # basically an indexer for included terms
     count = 0
     modelIdx = []
     for i in a:
@@ -303,10 +310,14 @@ def Variational_Bayes_Code(X, y, initz0, tol, verbosity):
 
     modelIdx = np.setdiff1d(modelIdx, 0)
     out_vb["modelIdx"] = modelIdx - 1
-    out_vb["Zmed"] = DS["zmean"][modelIdx]
-    out_vb["Wsel"] = DS["wmean"][modelIdx]
-    out_vb["Wcov"] = DS["wCOV"][modelIdx, modelIdx]
-    out_vb["sig2"] = DS["sig2"]
+    out_vb["Zmed"] = DS["zmean"][
+        modelIdx
+    ]  # picks out the 'posterior inclusion probability' of a given term
+    out_vb["Wsel"] = DS["wmean"][modelIdx]  # coefficient estimates of selected terms
+    out_vb["Wcov"] = DS["wCOV"][
+        modelIdx, modelIdx
+    ]  # posterior covariance of selected terms
+    out_vb["sig2"] = DS["sig2"]  # estimated noise variance
 
     return out_vb
 
@@ -318,15 +329,15 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
     A,B   : constants of the IG prior over noise variance
     tau0  : Expected value of (sigma^{-2})
     p0    : inclusion probablility
-    initz : Initial value of z
+    initz : Initial value of z (inclusion prob)
     Xc    : Centered and standardized dictionary except the first column
     yc    : Centered observations"""
 
     DS = {}
-    Lambda = logit(p0)
+    Lambda = logit(p0)  # log odds space for stability purposes
     iter_ = 0
     max_iter = 100
-    LL = np.zeros(max_iter)
+    LL = np.zeros(max_iter)  # i think for log-likelihood (actually ELBO) storage
     zm = np.reshape(initz, (-1))
     taum = tau0
     invVs = 1 / vs
@@ -334,6 +345,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
 
     X = Xc
     y = yc
+    # precomupted for efficiency reasons
     XtX = (X.T) @ X
     XtX = 0.5 * (XtX + (XtX).T)
     Xty = (X.T) @ y
@@ -351,7 +363,9 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
             break
 
         Zm = np.diag(zm)
-        Omg = (np.reshape(zm, (-1, 1)) @ np.reshape(zm, (1, -1))) + (Zm @ (eyep - Zm))
+        Omg = (np.reshape(zm, (-1, 1)) @ np.reshape(zm, (1, -1))) + (
+            Zm @ (eyep - Zm)
+        )  # second moments of inlcusion indicators
         # Update the mean and covariance of the coefficients given mean of z
         term1 = XtX * Omg  # elementwisw multiplication
         invSigma = taum * (term1 + invVs * eyep)
@@ -371,10 +385,14 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
             warnings.warn("s turned out be less than 0. Taking absolute value")
             s = B + 0.5 * abs(term4)
 
-        taum = Abar / s
+        taum = Abar / s  # updating the posterior noise precision
         zstr = zm
         order = np.setdiff1d(np.random.permutation(p), 0, assume_unique=True)
-        for j in order:
+        for (
+            j
+        ) in (
+            order
+        ):  # random ordering prevents getting stuck in bad local optima - basically stochastic coordinate ascent?
             muj = mu[j]
             sigmaj = Sigma[j, j]
 
@@ -397,7 +415,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
 
         zm = zstr
 
-        # Calculate marginal log-likelihood
+        # Calculate marginal log-likelihood [better referred to as ELBO, kind of a misleading name]
         LL[iter_] = (
             0.5 * p
             - 0.5 * N * np.log(2 * np.pi)

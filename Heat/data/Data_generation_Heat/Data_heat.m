@@ -24,16 +24,16 @@ sol = zeros(J+1,N+1,sample);
 for i = 1:sample
     i
     [t,ut]=spde_fd_n_exp(u0,T,a,N,J,epsilon,sigma,ell,@(u) 0);
-    sol(:,:,i) = ut;
+    sol(:,:,i) = ut; %3d solution, space, time, realisations
 end
 
 % Linear variation:
-y = sol(:,2:end,:)-sol(:,1:end-1,:);
+y = sol(:,2:end,:)-sol(:,1:end-1,:); %consecutive differences
 dt= T/N;
 
 % Extended Kramers-Moyal moments:
 xdt = (1/dt)*mean(y,3);
-xdiff = (1/dt)*mean(y.*y,3);
+xdiff = (1/dt)*mean(y.*y,3); %average of delta squared
 
 save('../Heat_dx_64m_500t.mat', 'xdt', 'xdiff', 'sol')
 
