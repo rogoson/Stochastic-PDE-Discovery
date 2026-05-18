@@ -71,6 +71,11 @@ Heat was run with **1000 ensembles** rather than the 2000 stated in the paper. T
 **9. ELBO monotonicity violation in VB.**
 The "OOPS! log(like) decreasing!!" message appears in the Nagumo VB run, and Allen Cahn seems to have some zero stability errors. Under CAVI, the ELBO should be monotonically non-decreasing by construction — a decrease indicates a numerical bug in the implementation. The algorithm recovers in these cases, but this violates a theoretical guarantee the paper implicitly relies on.
 
+**10. Boundary Conditions.**
+The original implementation uses zero-Neumann boundary conditions (du/dx = 0 at 
+x=0 and x=20), this is inconsistent with equation (38) which specifies periodic 
+boundary conditions where u(t, x=0) = u(t, x=20). Zero-Neumann does 
+incidentally result in equal derivatives at both boundaries, but it doesn't mean that the field values are always equivalent. 
 ****
 
 

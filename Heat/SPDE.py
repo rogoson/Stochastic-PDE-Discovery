@@ -393,7 +393,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
                     @ ((mu_j * muj + Sigma_jj).reshape(-1, 1))
                 )
             )
-            zstr[j] = expit(etaj)
+            zstr[j] = expit(etaj.item())
 
         zm = zstr
 
