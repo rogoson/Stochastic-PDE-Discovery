@@ -88,7 +88,7 @@ def Lasso(X0, Y, lam, w=None, maxit=100, normalize=2):
         return w
 
 
-def FiniteDiff(u, dx, d):
+def FiniteDiff(u, dx, d, periodic=False):
     """
     Takes dth derivative data using 2nd order finite difference method (up to d=3)
     Works but with poor accuracy for d > 3
@@ -105,42 +105,56 @@ def FiniteDiff(u, dx, d):
         for i in range(1, n - 1):
             ux[i] = (u[i + 1] - u[i - 1]) / (2 * dx)
 
-        ux[0] = (-3.0 / 2 * u[0] + 2 * u[1] - u[2] / 2) / dx
-        ux[n - 1] = (3.0 / 2 * u[n - 1] - 2 * u[n - 2] + u[n - 3] / 2) / dx
+        if periodic:
+            ux[0] = (u[1] - u[n - 1]) / (2 * dx)
+            ux[n - 1] = (u[0] - u[n - 2]) / (2 * dx)
+        else:
+            ux[0] = (-3.0 / 2 * u[0] + 2 * u[1] - u[2] / 2) / dx
+            ux[n - 1] = (3.0 / 2 * u[n - 1] - 2 * u[n - 2] + u[n - 3] / 2) / dx
         return ux
 
     if d == 2:
         for i in range(1, n - 1):
             ux[i] = (u[i + 1] - 2 * u[i] + u[i - 1]) / dx**2
 
-        ux[0] = (2 * u[0] - 5 * u[1] + 4 * u[2] - u[3]) / dx**2
-        ux[n - 1] = (2 * u[n - 1] - 5 * u[n - 2] + 4 * u[n - 3] - u[n - 4]) / dx**2
+        if periodic:
+            ux[0] = (u[1] - 2 * u[0] + u[n - 1]) / dx**2
+            ux[n - 1] = (u[0] - 2 * u[n - 1] + u[n - 2]) / dx**2
+        else:
+            ux[0] = (2 * u[0] - 5 * u[1] + 4 * u[2] - u[3]) / dx**2
+            ux[n - 1] = (2 * u[n - 1] - 5 * u[n - 2] + 4 * u[n - 3] - u[n - 4]) / dx**2
         return ux
 
     if d == 3:
         for i in range(2, n - 2):
             ux[i] = (u[i + 2] / 2 - u[i + 1] + u[i - 1] - u[i - 2] / 2) / dx**3
 
-        ux[0] = (-2.5 * u[0] + 9 * u[1] - 12 * u[2] + 7 * u[3] - 1.5 * u[4]) / dx**3
-        ux[1] = (-2.5 * u[1] + 9 * u[2] - 12 * u[3] + 7 * u[4] - 1.5 * u[5]) / dx**3
-        ux[n - 1] = (
-            2.5 * u[n - 1]
-            - 9 * u[n - 2]
-            + 12 * u[n - 3]
-            - 7 * u[n - 4]
-            + 1.5 * u[n - 5]
-        ) / dx**3
-        ux[n - 2] = (
-            2.5 * u[n - 2]
-            - 9 * u[n - 3]
-            + 12 * u[n - 4]
-            - 7 * u[n - 5]
-            + 1.5 * u[n - 6]
-        ) / dx**3
+        if periodic:
+            ux[0] = (u[2] / 2 - u[1] + u[n - 1] - u[n - 2] / 2) / dx**3
+            ux[1] = (u[3] / 2 - u[2] + u[0] - u[n - 1] / 2) / dx**3
+            ux[n - 1] = (u[1] / 2 - u[0] + u[n - 2] - u[n - 3] / 2) / dx**3
+            ux[n - 2] = (u[0] / 2 - u[n - 1] + u[n - 3] - u[n - 4] / 2) / dx**3
+        else:
+            ux[0] = (-2.5 * u[0] + 9 * u[1] - 12 * u[2] + 7 * u[3] - 1.5 * u[4]) / dx**3
+            ux[1] = (-2.5 * u[1] + 9 * u[2] - 12 * u[3] + 7 * u[4] - 1.5 * u[5]) / dx**3
+            ux[n - 1] = (
+                2.5 * u[n - 1]
+                - 9 * u[n - 2]
+                + 12 * u[n - 3]
+                - 7 * u[n - 4]
+                + 1.5 * u[n - 5]
+            ) / dx**3
+            ux[n - 2] = (
+                2.5 * u[n - 2]
+                - 9 * u[n - 3]
+                + 12 * u[n - 4]
+                - 7 * u[n - 5]
+                + 1.5 * u[n - 6]
+            ) / dx**3
         return ux
 
     if d > 3:
-        return FiniteDiff(FiniteDiff(u, dx, 3), dx, d - 3)
+        return FiniteDiff(FiniteDiff(u, dx, 3, periodic), dx, d - 3, periodic)
 
 
 def build_linear_system(
@@ -156,6 +170,7 @@ def build_linear_system(
     deg_x=5,
     deg_t=None,
     sigma=2,
+    periodic=False,
 ):
     """
     Constructs a large linear system to use in later regression for finding PDE.
@@ -181,6 +196,7 @@ def build_linear_system(
             sigma = standard deviation of gaussian smoother
                     only applies if time_diff = 'FDconv'
                     default = 2
+            periodic = whether to use periodic boundary conditions (default = False)
     Output:
         ut = column vector of length u.size
         R = matrix with ((D+1)*(P+1)) of column, each as large as ut
@@ -223,7 +239,7 @@ def build_linear_system(
 
         if d > 0:
             for i in range(m2):
-                ux[:, i] = FiniteDiff(u[:, i + offset_t], dx, d)
+                ux[:, i] = FiniteDiff(u[:, i + offset_t], dx, d, periodic)
         else:
             ux = np.ones((n2, m2), dtype=np.float64)
 
