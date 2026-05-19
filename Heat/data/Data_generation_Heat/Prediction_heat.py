@@ -67,18 +67,19 @@ function heat_noise_jl(du, u, p, t)
     end
 end
 
-using SciMLBase
+using SciMLBase, Random
 function prob_func_true(prob, context)
     i = context.sim_id
     u0_i = collect(Float64, Main.initialConditions[i])
-    remake(prob, u0=u0_i)
+    rng = Random.MersenneTwister(i)  # seed with trajectory index [same noise path for true/pred sample]
+    remake(prob, u0=u0_i, seed=i)
 end
 
 function prob_func_pred(prob, context)
     i = context.sim_id
     u0_i = collect(Float64, Main.initialConditions[i])
     p_i = (Main.epsArr[i], Main.dxVal, Main.sigArr[i])
-    remake(prob, u0=u0_i, p=p_i)
+    remake(prob, u0=u0_i, p=p_i, seed=i)  # same seed i as true
 end
 """)
 
