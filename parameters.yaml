@@ -1,0 +1,72 @@
+# Parameters for SPDE Discovery
+# Source: Mathpati et al. (2024)
+
+common:
+  x_start: 0
+  x_end: 20
+  t_start: 0
+  t_end: 1
+  J: 64
+  dx: 0.3125 # L/J = 20/64
+  timesteps: 500
+  dt: 0.002 # T/N = 1/500
+  N_samples: 2000
+  periodic: true
+  prediction_samples: 200
+  lasso_drift_lambda: 0.2
+  sindy_drift_lambda: 0.2
+  lasso_diffusion_lambda: 0.1
+  sindy_diffusion_lambda: 0.1
+
+heat:
+  # du = epsilon*u_xx*dt + sigma*dW
+  initial_condition: "sin(x)"
+  correct:
+    epsilon: 1
+    sigma: 1
+  discovered:
+    epsilon: ~
+    epsilon_variance: ~
+    sigma_squared: ~
+    sigma_squared_variance: ~
+
+allen_cahn:
+  # du = (epsilon*u_xx + u - u^3)dt + sigma*dW
+  initial_condition: "sin(x)"
+  correct:
+    epsilon: 1
+    sigma: 1
+    u_coeff: 1
+    u3_coeff: -1
+  discovered:
+    epsilon: ~
+    epsilon_variance: ~
+    u_coeff: ~
+    u_coeff_variance: ~
+    u3_coeff: ~
+    u3_coeff_variance: ~
+    sigma: ~
+    sigma_variance: ~
+
+nagumo:
+  # du = (epsilon*u_xx + u(1-u)(u-alpha))dt + sigma*dW
+  # expanded: epsilon*u_xx + 0.5u + 0.5u^2 - u^3
+  initial_condition: "cos(x)"
+  correct:
+    epsilon: 1
+    sigma: 1
+    alpha: -0.5
+    u_coeff: 0.5
+    u2_coeff: 0.5
+    u3_coeff: -1
+  discovered:
+    epsilon: ~
+    epsilon_variance: ~
+    u_coeff: ~
+    u_coeff_variance: ~
+    u2_coeff: ~
+    u2_coeff_variance: ~
+    u3_coeff: ~
+    u3_coeff_variance: ~
+    sigma: ~
+    sigma_variance: ~

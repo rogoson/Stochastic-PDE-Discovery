@@ -341,7 +341,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
     DS = {}
     Lambda = logit(p0)
     iter_ = 0
-    max_iter = 100
+    max_iter = 1000
     LL = np.zeros(max_iter)
     zm = np.reshape(initz, (-1))
     taum = tau0
