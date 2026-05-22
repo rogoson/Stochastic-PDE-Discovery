@@ -134,7 +134,9 @@ def samplePredParameters(method, nSamples):
 
     # override dx for allen cahn, 400hz used instead of 500 in the paper
 
-    if any(param is None for param in disc.values()):
+    if any(
+        param is None for param in disc.values()
+    ):  # wrong but probably the most graceful way to handle this - can't generate new julia code on the fly for a broken model
         print(
             f"Warning: no discovered parameters for {method}, using True parameters for predictions."
         )
@@ -152,8 +154,14 @@ def samplePredParameters(method, nSamples):
         )
         return [(epsilon[i], dx, sigma[i]) for i in range(nSamples)]
     elif method == "allen_cahn":
-        sigma = masterRng.normal(
-            disc["sigma"], np.sqrt(disc["sigma_variance"]), nSamples
+        sigma = np.sqrt(
+            np.abs(
+                masterRng.normal(
+                    disc["sigma_squared"],
+                    np.sqrt(disc["sigma_squared_variance"]),
+                    nSamples,
+                )
+            )
         )
         u_coeff = masterRng.normal(
             disc["u_coeff"], np.sqrt(disc["u_coeff_variance"]), nSamples
@@ -165,9 +173,15 @@ def samplePredParameters(method, nSamples):
             (epsilon[i], dx, sigma[i], u_coeff[i], u3_coeff[i]) for i in range(nSamples)
         ]
     elif method == "nagumo":
-        sigma = masterRng.normal(
-            disc["sigma"], np.sqrt(disc["sigma_variance"]), nSamples
-        )
+        sigma = np.sqrt(
+            np.abs(
+                masterRng.normal(
+                    disc["sigma_squared"],
+                    np.sqrt(disc["sigma_squared_variance"]),
+                    nSamples,
+                )
+            )
+        )  # because it discovers the squared form
         u_coeff = masterRng.normal(
             disc["u_coeff"], np.sqrt(disc["u_coeff_variance"]), nSamples
         )

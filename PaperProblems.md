@@ -76,6 +76,9 @@ The original implementation uses zero-Neumann boundary conditions (du/dx = 0 at
 x=0 and x=20), this is inconsistent with equation (38) which specifies periodic 
 boundary conditions where u(t, x=0) = u(t, x=20) and sin(0) != sin(20) (initial spatial condition). Zero-Neumann does 
 incidentally result in equal derivatives at both boundaries, but it doesn't mean that the field values are always equivalent. 
+
+**11. Stochastic SINDy Threshold may be inconsistent**
+At least in the notebook - heat is the only one that has an actual value of 0.2 for the sparsity threshold I believe.
 ****
 
 

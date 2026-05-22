@@ -1,57 +1,51 @@
-# Parameters for SPDE Discovery
-# Source: Mathpati et al. (2024)
-
 common:
   x_start: 0
   x_end: 20
   t_start: 0
   t_end: 1
   J: 64
-  dx: 0.3125 # L/J = 20/64
+  dx: 0.3125
   timesteps: 500
-  dt: 0.002 # T/N = 1/500
+  dt: 0.002
   N_samples: 2000
   periodic: true
   prediction_samples: 200
   lasso_drift_lambda: 0.2
-  sindy_drift_lambda: 0.2
+  sindy_drift_lambda: 0.3
   lasso_diffusion_lambda: 0.1
   sindy_diffusion_lambda: 0.1
-
 heat:
-  # du = epsilon*u_xx*dt + sigma*dW
-  initial_condition: "sin(x)"
+  initial_condition: sin(x)
   correct:
     epsilon: 1
     sigma: 1
   discovered:
-    epsilon: ~
-    epsilon_variance: ~
-    sigma_squared: ~
-    sigma_squared_variance: ~
-
+    epsilon: 0.986488
+    epsilon_variance: 2.754e-05
+    sigma_squared: 0.979152
+    sigma_squared_variance: 3.0e-08
+    u_coeff: -0.07774
+    u_coeff_variance: 0.00396952
+    u3_coeff: 0.329612
+    u3_coeff_variance: 0.06142343
 allen_cahn:
-  # du = (epsilon*u_xx + u - u^3)dt + sigma*dW
-  initial_condition: "sin(x)"
+  initial_condition: sin(x)
   correct:
     epsilon: 1
     sigma: 1
     u_coeff: 1
     u3_coeff: -1
   discovered:
-    epsilon: ~
-    epsilon_variance: ~
-    u_coeff: ~
-    u_coeff_variance: ~
-    u3_coeff: ~
-    u3_coeff_variance: ~
-    sigma: ~
-    sigma_variance: ~
-
+    epsilon: 0.609065
+    epsilon_variance: 0.00024998
+    u_coeff: null
+    u_coeff_variance: null
+    u3_coeff: 0.52632
+    u3_coeff_variance: 0.00459967
+    sigma_squared: 0.979002
+    sigma_squared_variance: 3.0e-08
 nagumo:
-  # du = (epsilon*u_xx + u(1-u)(u-alpha))dt + sigma*dW
-  # expanded: epsilon*u_xx + 0.5u + 0.5u^2 - u^3
-  initial_condition: "cos(x)"
+  initial_condition: cos(x)
   correct:
     epsilon: 1
     sigma: 1
@@ -60,13 +54,13 @@ nagumo:
     u2_coeff: 0.5
     u3_coeff: -1
   discovered:
-    epsilon: ~
-    epsilon_variance: ~
-    u_coeff: ~
-    u_coeff_variance: ~
-    u2_coeff: ~
-    u2_coeff_variance: ~
-    u3_coeff: ~
-    u3_coeff_variance: ~
-    sigma: ~
-    sigma_variance: ~
+    epsilon: 0.777404
+    epsilon_variance: 0.00175444
+    u_coeff: null
+    u_coeff_variance: null
+    u2_coeff: null
+    u2_coeff_variance: null
+    u3_coeff: null
+    u3_coeff_variance: null
+    sigma_squared: 0.978623
+    sigma_squared_variance: 3.0e-08
