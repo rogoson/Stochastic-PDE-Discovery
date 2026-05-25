@@ -369,10 +369,10 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
         Zm = np.diag(zm)
         Omg = (np.reshape(zm, (-1, 1)) @ np.reshape(zm, (1, -1))) + (Zm @ (eyep - Zm))
         # Update the mean and covariance of the coefficients given mean of z
-        term1 = XtX * Omg  # elementwisw multiplication
+        term1 = XtX * Omg  # elementwise multiplication
         invSigma = taum * (term1 + invVs * eyep)
         invSigma = 0.5 * (invSigma + invSigma.T)  # symmetric
-        Sigma = la.inv(invSigma) @ eyep
+        Sigma = la.solve(invSigma, eyep)  # more stable than explicit inversion
         mu = taum * (Sigma @ Zm @ Xty)  # @ ---> matrix multiplication
 
         # Update tau related to sigma
@@ -388,7 +388,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
             s = B + 0.5 * abs(term4)
 
         taum = Abar / s
-        zstr = zm
+        zstr = zm.copy()  # copy to avoid reference mutation during update
         order = np.setdiff1d(np.random.permutation(p), 0, assume_unique=True)
         for j in order:
             muj = mu[j]
@@ -409,11 +409,15 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
                     @ ((mu_j * muj + Sigma_jj).reshape(-1, 1))
                 )
             )
-            zstr[j] = expit(etaj.item())
+            zstr[j] = expit(np.clip(etaj.item(), -500, 500))
 
         zm = zstr
 
         # Calculate marginal log-likelihood
+        # clip zm away from 0 and 1 to avoid log(0) and 0*log(0) = nan
+        zm_clipped = np.clip(zm, 1e-10, 1 - 1e-10)
+        # use slogdet instead of log(det()) to avoid underflow for large p
+        sign, logdet = np.linalg.slogdet(Sigma)
         LL[iter_] = (
             0.5 * p
             - 0.5 * N * np.log(2 * np.pi)
@@ -422,9 +426,9 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
             - loggamma(A)
             + loggamma(Abar)
             - Abar * np.log(s)
-            + 0.5 * np.log(la.det(Sigma))
-            + np.nansum(zm * (np.log(p0) - np.log(zm)))
-            + np.nansum((1 - zm) * (np.log(1 - p0) - np.log(1 - zm)))
+            + 0.5 * logdet
+            + np.nansum(zm_clipped * (np.log(p0) - np.log(zm_clipped)))
+            + np.nansum((1 - zm_clipped) * (np.log(1 - p0) - np.log(1 - zm_clipped)))
         )
 
         if verbosity:
