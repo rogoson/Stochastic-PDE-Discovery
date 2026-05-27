@@ -3,6 +3,7 @@ import os
 import numpy as np
 import yaml
 import matplotlib.pyplot as plt
+from utils import tabulate_neatly
 from juliacall import Main as jl
 from diffeqpy import de
 
@@ -93,7 +94,7 @@ def getParameters(method):
 def convergence_study(method="heat", dt_multipliers=[1, 0.5, 0.25, 0.1, 0.05]):
     """
     Show KM diffusion estimate converges to true sigma^2 as dt -> 0
-    for EM and SRIW1 fixed step.
+    for EM, SRIW1 fixed step, and SRIW1 adaptive.
     """
     DIAG_SAMPLES = 200
     p = getParameters(method)
@@ -107,17 +108,15 @@ def convergence_study(method="heat", dt_multipliers=[1, 0.5, 0.25, 0.1, 0.05]):
     expected = yamlParameters[method]["correct"]["sigma"] ** 2
 
     solvers = {
-        "EM": de.EM(),
-        "SRIW1 (fixed)": de.SRIW1(),
+        "EM": {"solver": de.EM(), "adaptive": False},
+        "SRIW1 (fixed)": {"solver": de.SRIW1(), "adaptive": False},
+        "SRIW1 (adaptive)": {"solver": de.SRIW1(), "adaptive": True},
     }
 
     results = {name: [] for name in solvers}
     dt_values = [base_dt * m for m in dt_multipliers]
 
     for dt_val in dt_values:
-        # adjust saveat and timesteps to keep same total time
-        saveat_val = dt_val
-
         baseProblem = de.SDEProblem(
             driftEquations[method],
             jl.oned_noise_jl,
@@ -127,15 +126,20 @@ def convergence_study(method="heat", dt_multipliers=[1, 0.5, 0.25, 0.1, 0.05]):
         )
         ensembleProblem = de.EnsembleProblem(baseProblem)
 
-        for name, solver in solvers.items():
+        for name, config in solvers.items():
+            kwargs = {
+                "trajectories": DIAG_SAMPLES,
+                "saveat": dt_val,
+                "dt": dt_val,
+            }
+            if not config["adaptive"]:
+                kwargs["adaptive"] = False
+
             sol = de.solve(
                 ensembleProblem,
-                solver,
+                config["solver"],
                 de.EnsembleThreads(),
-                trajectories=DIAG_SAMPLES,
-                saveat=saveat_val,
-                dt=dt_val,
-                adaptive=False,
+                **kwargs,
             )
             uStore = np.zeros((N, int(endTime / dt_val) + 1, DIAG_SAMPLES))
             for i in range(DIAG_SAMPLES):
@@ -146,6 +150,18 @@ def convergence_study(method="heat", dt_multipliers=[1, 0.5, 0.25, 0.1, 0.05]):
             xdiff_mean = (1 / dt_val) * np.mean(y * y)
             results[name].append(xdiff_mean)
             print(f"{name}, dt={dt_val:.4f}: KM estimate = {xdiff_mean:.4f}")
+
+    # tabulate results
+    table_rows = []
+    for name, vals in results.items():
+        for dt_val, km_est in zip(dt_values, vals):
+            bias_pct = round((km_est - expected) / expected * 100, 2)
+            table_rows.append([name, round(dt_val, 4), round(km_est, 4), bias_pct])
+    tabulate_neatly(
+        table_rows,
+        headers=["Solver", "dt", "KM Estimate", "Bias (%)"],
+        title=f"KM Diffusion Estimate Convergence — {method} (true σ²={expected})",
+    )
 
     # plot
     plt.rcParams["font.family"] = "serif"
