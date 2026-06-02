@@ -20,16 +20,16 @@ heat:
     epsilon: 1
     sigma: 1
   discovered:
-    epsilon: 0.986488
-    epsilon_variance: 2.754e-05
-    sigma_squared: 0.979152
-    sigma_squared_variance: 3.0e-08
-    u_coeff: -0.018593
-    u_coeff_variance: 5.333e-05
-    u3_coeff: 0.032807
-    u3_coeff_variance: 0.00071632
-    u2_coeff: -0.022688
-    u2_coeff_variance: 0.00025403
+    epsilon: 0.012823
+    epsilon_variance: 5.121e-05
+    sigma_squared: 0.973721
+    sigma_squared_variance: 4.76e-06
+    u_coeff: 0.141736
+    u_coeff_variance: 0.01284694
+    u3_coeff: -0.340856
+    u3_coeff_variance: 0.0511862
+    u2_coeff: 0.090564
+    u2_coeff_variance: 0.02368604
 allen_cahn:
   initial_condition: sin(x)
   correct:
@@ -38,18 +38,18 @@ allen_cahn:
     u_coeff: 1
     u3_coeff: -1
   discovered:
-    epsilon: 0.609065
-    epsilon_variance: 0.00024998
-    u_coeff: -0.035232
-    u_coeff_variance: 6.301e-05
-    u3_coeff: 0.52632
-    u3_coeff_variance: 0.00459967
+    epsilon: 0.936067
+    epsilon_variance: 0.00299163
+    u_coeff: 1.073529
+    u_coeff_variance: 0.01894788
+    u3_coeff: -1.241683
+    u3_coeff_variance: 0.13285314
     sigma: null
     sigma_variance: null
-    sigma_squared: 0.979002
-    sigma_squared_variance: 3.0e-08
-    u2_coeff: -0.048929
-    u2_coeff_variance: 0.00029246
+    sigma_squared: 0.976205
+    sigma_squared_variance: 6.11e-06
+    u2_coeff: -0.020691
+    u2_coeff_variance: 0.00024168
 nagumo:
   initial_condition: cos(x)
   correct:
@@ -60,15 +60,15 @@ nagumo:
     u2_coeff: 0.5
     u3_coeff: -1
   discovered:
-    epsilon: 0.777404
-    epsilon_variance: 0.00175444
-    u_coeff: 0.028458
-    u_coeff_variance: 7.396e-05
-    u2_coeff: 0.020307
-    u2_coeff_variance: 0.00042649
-    u3_coeff: -0.043819
-    u3_coeff_variance: 0.00117663
+    epsilon: 0.829424
+    epsilon_variance: 0.01610512
+    u_coeff: 0.023334
+    u_coeff_variance: 9.429e-05
+    u2_coeff: -0.041942
+    u2_coeff_variance: 0.0003741
+    u3_coeff: -0.054118
+    u3_coeff_variance: 0.00086082
     sigma: null
     sigma_variance: null
-    sigma_squared: 0.978623
-    sigma_squared_variance: 3.0e-08
+    sigma_squared: 0.977631
+    sigma_squared_variance: 7.03e-06

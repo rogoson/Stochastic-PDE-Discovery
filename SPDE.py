@@ -284,7 +284,9 @@ def print_pde(w, rhs_description, ut="u_t"):
     print(pde)
 
 
-def Variational_Bayes_Code(X, y, initz0, tol, verbosity):
+def Variational_Bayes_Code(
+    X, y, initz0, tol, verbosity, p0, vs, A=1e-4, B=1e-4, tau0=1000
+):
     if len(X) == 0 or len(y) == 0:
         raise Exception("X and or y is missing")
 
@@ -293,18 +295,15 @@ def Variational_Bayes_Code(X, y, initz0, tol, verbosity):
 
     N = len(X)
     # Prior parameters of noise variance (Inverse Gamma dist)
-    A = 1e-4
-    B = 1e-4
-    vs = 10
-    tau0 = 1000
+    # A = 1e-4
+    # B = 1e-4
+    # vs = 100
+    # tau0 = 1000
 
     if len(initz0) == 0:
         raise Exception("No initial value of z found")
     else:
-        p0 = expit(-0.5 * (np.sqrt(N)))
-
-        # Adding the intercept indicator variable (slightly less than 1 to prevent log(0) values)
-        # initz = np.hstack((1,initz0))
+        p0 = p0  # using exponent results in really small incl prob - could have been another mistake with the exp (really small for large datasets)
         initz = initz0
         DS, LLcvg = run_VB2(X, y, vs, A, B, tau0, p0, initz, tol, verbosity)
 
@@ -333,7 +332,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
     vs    : treated as a constant
     A,B   : constants of the IG prior over noise variance
     tau0  : Expected value of (sigma^{-2})
-    p0    : inclusion probablility
+    p0    : inclusion probability
     initz : Initial value of z
     Xc    : Centered and standardized dictionary except the first column
     yc    : Centered observations"""
@@ -363,7 +362,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
     converged = 0
 
     while converged == 0:
-        if iter_ == 100:
+        if iter_ == max_iter:  # use max_iter not hardcoded 100
             break
 
         Zm = np.diag(zm)
@@ -371,7 +370,9 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
         # Update the mean and covariance of the coefficients given mean of z
         term1 = XtX * Omg  # elementwise multiplication
         invSigma = taum * (term1 + invVs * eyep)
-        invSigma = 0.5 * (invSigma + invSigma.T)  # symmetric
+        invSigma = 0.5 * (
+            invSigma + invSigma.T
+        )  # damn sure hope its symmetric, but should be since covar
         Sigma = la.solve(invSigma, eyep)  # more stable than explicit inversion
         mu = taum * (Sigma @ Zm @ Xty)  # @ ---> matrix multiplication
 
@@ -416,6 +417,9 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
         # Calculate marginal log-likelihood
         # clip zm away from 0 and 1 to avoid log(0) and 0*log(0) = nan
         zm_clipped = np.clip(zm, 1e-10, 1 - 1e-10)
+        traceTerm = (
+            -0.5 * invVs * (np.dot(mu, mu) + np.trace(Sigma))
+        )  # missing  but not really used for update
         # use slogdet instead of log(det()) to avoid underflow for large p
         sign, logdet = np.linalg.slogdet(Sigma)
         LL[iter_] = (
@@ -427,6 +431,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
             + loggamma(Abar)
             - Abar * np.log(s)
             + 0.5 * logdet
+            + traceTerm
             + np.nansum(zm_clipped * (np.log(p0) - np.log(zm_clipped)))
             + np.nansum((1 - zm_clipped) * (np.log(1 - p0) - np.log(1 - zm_clipped)))
         )
@@ -439,11 +444,12 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
 
             if cvg < 0 and verbosity:
                 print("OOPS!  log(like) decreasing!!")
-            elif cvg < tol or iter_ > max_iter:
+            elif abs(cvg) < tol or iter_ > max_iter:  # abs() to handle numerical noise
                 converged = 1
                 LL = LL[0:iter_]
 
         iter_ = iter_ + 1
+
     DS["zmean"] = zm
     DS["wmean"] = mu
     DS["wCOV"] = Sigma

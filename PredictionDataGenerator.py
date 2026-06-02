@@ -23,10 +23,12 @@ timeSpan = (yamlParameters["common"]["t_start"], endTime)
 K = 10  # use 10 chebyschev terms
 xCheb = 2 * x / L - 1
 
-initialConditionFunctions = {
-    "heat": list(np.sin(x)),
-    "allen_cahn": list(np.sin(x)),
-    "nagumo": list(np.cos(x)),
+initialConditions = {
+    "heat": list(
+        np.sin(2 * np.pi * x / L)
+    ),  # sin(0)=0, sin(20*2pi/20)=sin(2pi)=0 - fixing period
+    "allen_cahn": list(np.sin(2 * np.pi * x / L)),
+    "nagumo": list(np.cos(2 * np.pi * x / L)),  # cos(0)=1, cos(2pi)=1
 }
 
 
