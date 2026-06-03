@@ -171,6 +171,7 @@ def build_linear_system(
     deg_t=None,
     sigma=2,
     periodic=False,
+    legendre=False,
 ):
     """
     Constructs a large linear system to use in later regression for finding PDE.
@@ -231,6 +232,17 @@ def build_linear_system(
     # Now form the rhs one column at a time, and record what each one is
     ########################
     u2 = u[offset_x : n - offset_x, offset_t : m - offset_t]
+
+    # scale to fall between -1 and 1 for legendre polynomials [where orthogonal]
+    if legendre:
+        umin = np.min(u2)
+        umax = np.max(u2)
+
+        if np.isclose(umax, umin):
+            raise ValueError("u is constant; Legendre scaling is undefined.")
+
+        uLeg = 2 * (u2 - umin) / (umax - umin) - 1
+
     Theta = np.zeros((n2 * m2, (D + 1) * (P + 1)), dtype=np.float64)
     ux = np.zeros((n2, m2), dtype=np.float64)
     rhs_description = ["" for i in range((D + 1) * (P + 1))]
@@ -244,25 +256,28 @@ def build_linear_system(
             ux = np.ones((n2, m2), dtype=np.float64)
 
         for p in range(P + 1):
-            Theta[:, d * (P + 1) + p] = np.reshape(
-                np.multiply(ux, np.power(u2, p)), (n2 * m2), order="F"
+
+            idx = d * (P + 1) + p
+
+            if not legendre:
+                basis = np.power(u2, p)
+                baseStr = "1" if p == 0 else ("u" if p == 1 else f"u^{p}")
+            else:
+                basis = np.polynomial.legendre.legval(uLeg, [0] * p + [1])
+                baseStr = f"P{p}(u)"
+
+            Theta[:, idx] = np.reshape(
+                ux * basis,
+                (n2 * m2),
+                order="F",
             )
 
-            if p == 1:
-                rhs_description[d * (P + 1) + p] = (
-                    rhs_description[d * (P + 1) + p] + "u"
-                )
-            elif p > 1:
-                rhs_description[d * (P + 1) + p] = (
-                    rhs_description[d * (P + 1) + p] + "u^" + str(p)
-                )
-            if d > 0:
-                rhs_description[d * (P + 1) + p] = (
-                    rhs_description[d * (P + 1) + p]
-                    + "u_{"
-                    + "".join(["x" for _ in range(d)])
-                    + "}"
-                )
+            if d == 0:
+                derivStr = ""
+            else:
+                derivStr = "u_" + "x" * d
+
+            rhs_description[idx] = baseStr + derivStr
 
     return ut, Theta, rhs_description
 
