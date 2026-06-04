@@ -3,6 +3,7 @@ from juliacall import Main as jl
 import numpy as np
 import matplotlib.pyplot as plt
 import yaml
+from scipy.ndimage import gaussian_filter
 import os
 
 np.random.seed(0)
@@ -23,12 +24,17 @@ timeSpan = (yamlParameters["common"]["t_start"], endTime)
 K = 10  # use 10 chebyschev terms
 xCheb = 2 * x / L - 1
 
+
+def random_smooth_ic(n, m, sigma=3):
+    u0 = np.random.randn(n, m)
+    u0 = gaussian_filter(u0, sigma=sigma)
+    return u0
+
+
 initialConditions = {
-    "heat": list(
-        np.sin(2 * np.pi * x / L)
-    ),  # sin(0)=0, sin(20*2pi/20)=sin(2pi)=0 - fixing period
-    "allen_cahn": list(np.sin(2 * np.pi * x / L)),
-    "nagumo": list(np.cos(2 * np.pi * x / L)),  # cos(0)=1, cos(2pi)=1
+    "heat": random_smooth_ic(len(x), 1).flatten(),
+    "allen_cahn": random_smooth_ic(len(x), 1).flatten(),
+    "nagumo": random_smooth_ic(len(x), 1).flatten(),
 }
 
 
