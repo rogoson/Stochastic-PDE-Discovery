@@ -261,7 +261,11 @@ def build_linear_system(
 
             if not legendre:
                 basis = np.power(u2, p)
-                baseStr = "1" if p == 0 else ("u" if p == 1 else f"u^{p}")
+                baseStr = (
+                    "1"
+                    if (p == 0 and d == 0)
+                    else ("u" if p == 1 else "" if p == 0 else f"u^{p}")
+                )
             else:
                 basis = np.polynomial.legendre.legval(uLeg, [0] * p + [1])
                 baseStr = f"P{p}(u)"

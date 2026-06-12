@@ -32,10 +32,19 @@ def random_smooth_ic(n, m, sigma=3):
     return u0
 
 
+# initialConditions = {
+#     "heat": random_smooth_ic(len(x), 1).flatten(),
+#     "allen_cahn": random_smooth_ic(len(x), 1).flatten(),
+#     "nagumo": random_smooth_ic(len(x), 1).flatten(),
+#     "kdv": random_smooth_ic(len(x), 1).flatten(),
+# }
+
 initialConditions = {
-    "heat": random_smooth_ic(len(x), 1).flatten(),
-    "allen_cahn": random_smooth_ic(len(x), 1).flatten(),
-    "nagumo": random_smooth_ic(len(x), 1).flatten(),
+    "heat": list(
+        np.sin(2 * np.pi * x / L)
+    ),  # sin(0)=0, sin(20*2pi/20)=sin(2pi)=0 - fixing period
+    "allen_cahn": list(np.sin(2 * np.pi * x / L)),
+    "nagumo": list(np.cos(2 * np.pi * x / L)),  # cos(0)=1, cos(2pi)=1
 }
 
 # normal heat update, but copying boundary conditions from matlab code (2x thing next to start/end)
@@ -72,6 +81,24 @@ function nagumo_drift_jl(du, u, p, t)
     du[{N}] = epsilon * (u[{N-1}] - 2u[{N}] + u[1]) / dx2 + u_coeff * u[{N}] + u2_coeff * u[{N}]^2 + u3_coeff * u[{N}]^3
 end
 
+function kdv_drift_jl(du, u, p, t)
+    epsilon, dx, sigma, uu_x_coeff, u_xxx_coeff = p
+    dx3 = dx^3
+    du[1] = u_xxx_coeff * (-u[3] + 2u[2] - 2u[{N}] + u[{N-1}]) / (2*dx3) +
+            uu_x_coeff * u[1] * (u[2] - u[{N}]) / (2*dx)
+    du[2] = u_xxx_coeff * (-u[4] + 2u[3] - 2u[1] + u[{N}]) / (2*dx3) +
+            uu_x_coeff * u[2] * (u[3] - u[1]) / (2*dx)
+    for i in 3:{N-2}
+        du[i] = u_xxx_coeff * (-u[i+2] + 2u[i+1] - 2u[i-1] + u[i-2]) / (2*dx3) +
+                uu_x_coeff * u[i] * (u[i+1] - u[i-1]) / (2*dx)
+    end
+    du[{N-1}] = u_xxx_coeff * (-u[1] + 2u[{N}] - 2u[{N-2}] + u[{N-3}]) / (2*dx3) +
+                uu_x_coeff * u[{N-1}] * (u[{N}] - u[{N-2}]) / (2*dx)
+    du[{N}] = u_xxx_coeff * (-u[2] + 2u[1] - 2u[{N-1}] + u[{N-2}]) / (2*dx3) +
+              uu_x_coeff * u[{N}] * (u[1] - u[{N-1}]) / (2*dx)
+end
+
+        
 function oned_noise_jl(du, u, p, t)
     sigma = p[3]
     for i in 1:{N}
@@ -97,6 +124,10 @@ def getParameters(method):
         p = (epsilon, dx, sigma, u_coeff, u2_coeff, u3_coeff)
     elif method == "heat":
         p = (epsilon, dx, sigma)
+    elif method == "kdv":
+        uu_x_coeff = yamlParameters[method]["correct"]["uu_x_coeff"]
+        u_xxx_coeff = yamlParameters[method]["correct"]["u_xxx_coeff"]
+        p = (epsilon, dx, sigma, uu_x_coeff, u_xxx_coeff)
     else:
         print("Unknown method: ", method)
         return
@@ -115,6 +146,7 @@ def generateData(method=None):
         "heat": jl.heat_drift_jl,
         "allen_cahn": jl.allen_cahn_drift_jl,
         "nagumo": jl.nagumo_drift_jl,
+        "kdv": jl.kdv_drift_jl,
     }
     baseProblem = de.SDEProblem(
         driftEquations[method],

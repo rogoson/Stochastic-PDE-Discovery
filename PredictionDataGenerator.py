@@ -31,10 +31,20 @@ def random_smooth_ic(n, m, sigma=3):
     return u0
 
 
+# initialConditions = {
+#     "heat": random_smooth_ic(len(x), 1).flatten(),
+#     "allen_cahn": random_smooth_ic(len(x), 1).flatten(),
+#     "nagumo": random_smooth_ic(len(x), 1).flatten(),
+#     "kdv": random_smooth_ic(len(x), 1).flatten(),
+# }
+
 initialConditions = {
-    "heat": random_smooth_ic(len(x), 1).flatten(),
-    "allen_cahn": random_smooth_ic(len(x), 1).flatten(),
-    "nagumo": random_smooth_ic(len(x), 1).flatten(),
+    "heat": list(
+        np.sin(2 * np.pi * x / L)
+    ),  # sin(0)=0, sin(20*2pi/20)=sin(2pi)=0 - fixing period
+    "allen_cahn": list(np.sin(2 * np.pi * x / L)),
+    "nagumo": list(np.cos(2 * np.pi * x / L)),  # cos(0)=1, cos(2pi)=1
+    "kdv": list(np.sin(2 * np.pi * x / L)),
 }
 
 
@@ -89,6 +99,23 @@ function nagumo_drift_jl(du, u, p, t)
     du[{N}] = epsilon * (u[{N-1}] - 2u[{N}] + u[1]) / dx2 + u_coeff * u[{N}] + u2_coeff * u[{N}]^2 + u3_coeff * u[{N}]^3
 end
 
+function kdv_drift_jl(du, u, p, t)
+    epsilon, dx, sigma, uu_x_coeff, u_xxx_coeff = p
+    dx3 = dx^3
+    du[1] = u_xxx_coeff * (-u[3] + 2u[2] - 2u[{N}] + u[{N-1}]) / (2*dx3) +
+            uu_x_coeff * u[1] * (u[2] - u[{N}]) / (2*dx)
+    du[2] = u_xxx_coeff * (-u[4] + 2u[3] - 2u[1] + u[{N}]) / (2*dx3) +
+            uu_x_coeff * u[2] * (u[3] - u[1]) / (2*dx)
+    for i in 3:{N-2}
+        du[i] = u_xxx_coeff * (-u[i+2] + 2u[i+1] - 2u[i-1] + u[i-2]) / (2*dx3) +
+                uu_x_coeff * u[i] * (u[i+1] - u[i-1]) / (2*dx)
+    end
+    du[{N-1}] = u_xxx_coeff * (-u[1] + 2u[{N}] - 2u[{N-2}] + u[{N-3}]) / (2*dx3) +
+                uu_x_coeff * u[{N-1}] * (u[{N}] - u[{N-2}]) / (2*dx)
+    du[{N}] = u_xxx_coeff * (-u[2] + 2u[1] - 2u[{N-1}] + u[{N-2}]) / (2*dx3) +
+              uu_x_coeff * u[{N}] * (u[1] - u[{N-1}]) / (2*dx)
+end
+
 function oned_noise_jl(du, u, p, t)
     sigma = p[3]
     for i in 1:{N}
@@ -114,20 +141,26 @@ end
 def getParameters(method):
     epsilon = yamlParameters[method]["correct"]["epsilon"]
     sigma = yamlParameters[method]["correct"]["sigma"]
+    dx = yamlParameters["common"]["dx"]
     if method == "allen_cahn":
         u_coeff = yamlParameters[method]["correct"]["u_coeff"]
         u3_coeff = yamlParameters[method]["correct"]["u3_coeff"]
-        return (epsilon, dx, sigma, u_coeff, u3_coeff)
+        p = (epsilon, dx, sigma, u_coeff, u3_coeff)
     elif method == "nagumo":
         u_coeff = yamlParameters[method]["correct"]["u_coeff"]
         u2_coeff = yamlParameters[method]["correct"]["u2_coeff"]
         u3_coeff = yamlParameters[method]["correct"]["u3_coeff"]
-        return (epsilon, dx, sigma, u_coeff, u2_coeff, u3_coeff)
+        p = (epsilon, dx, sigma, u_coeff, u2_coeff, u3_coeff)
     elif method == "heat":
-        return (epsilon, dx, sigma)
+        p = (epsilon, dx, sigma)
+    elif method == "kdv":
+        uu_x_coeff = yamlParameters[method]["correct"]["uu_x_coeff"]
+        u_xxx_coeff = yamlParameters[method]["correct"]["u_xxx_coeff"]
+        p = (epsilon, dx, sigma, uu_x_coeff, u_xxx_coeff)
     else:
         print("Unknown method: ", method)
-        return None
+        return
+    return p
 
 
 def samplePredParameters(method, nSamples):
@@ -136,9 +169,10 @@ def samplePredParameters(method, nSamples):
         yamlParameters = yaml.safe_load(f)
     disc = yamlParameters[method]["discovered"]
     masterRng = np.random.RandomState(42)
-    epsilon = masterRng.normal(
-        disc["epsilon"], np.sqrt(disc["epsilon_variance"]), nSamples
-    )
+    if "kdv" not in method.lower():  # hopefully kdv doesn't discover heat coeff
+        epsilon = masterRng.normal(
+            disc["epsilon"], np.sqrt(disc["epsilon_variance"]), nSamples
+        )
 
     # override dx for allen cahn, 400hz used instead of 500 in the paper
 
@@ -203,6 +237,26 @@ def samplePredParameters(method, nSamples):
             (epsilon[i], dx, sigma[i], u_coeff[i], u2_coeff[i], u3_coeff[i])
             for i in range(nSamples)
         ]
+    elif method == "kdv":
+        sigma = np.sqrt(
+            np.abs(
+                masterRng.normal(
+                    disc["sigma_squared"],
+                    np.sqrt(disc["sigma_squared_variance"]),
+                    nSamples,
+                )
+            )
+        )  # because it discovers the squared form
+        uu_x_coeff = masterRng.normal(
+            disc["uu_x_coeff"], np.sqrt(disc["uu_x_coeff_variance"]), nSamples
+        )
+        u_xxx_coeff = masterRng.normal(
+            disc["u_xxx_coeff"], np.sqrt(disc["u_xxx_coeff_variance"]), nSamples
+        )
+        return [
+            (epsilon[i], dx, sigma[i], uu_x_coeff[i], u_xxx_coeff[i])
+            for i in range(nSamples)
+        ]
 
 
 def generatePrediction(method=None):
@@ -215,6 +269,7 @@ def generatePrediction(method=None):
         "heat": jl.heat_drift_jl,
         "allen_cahn": jl.allen_cahn_drift_jl,
         "nagumo": jl.nagumo_drift_jl,
+        "kdv": jl.kdv_drift_jl,
     }
 
     pTrue = getParameters(method)
