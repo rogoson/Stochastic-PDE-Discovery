@@ -31,23 +31,6 @@ def random_smooth_ic(n, m, sigma=3):
     return u0
 
 
-# initialConditions = {
-#     "heat": random_smooth_ic(len(x), 1).flatten(),
-#     "allen_cahn": random_smooth_ic(len(x), 1).flatten(),
-#     "nagumo": random_smooth_ic(len(x), 1).flatten(),
-#     "kdv": random_smooth_ic(len(x), 1).flatten(),
-# }
-
-initialConditions = {
-    "heat": list(
-        np.sin(2 * np.pi * x / L)
-    ),  # sin(0)=0, sin(20*2pi/20)=sin(2pi)=0 - fixing period
-    "allen_cahn": list(np.sin(2 * np.pi * x / L)),
-    "nagumo": list(np.cos(2 * np.pi * x / L)),  # cos(0)=1, cos(2pi)=1
-    "kdv": list(np.sin(2 * np.pi * x / L)),
-}
-
-
 def chebyschevInitial(xCheb, K, rng):  # mixture of chebyschev initials
     T = np.polynomial.chebyshev.chebvander(
         xCheb, K

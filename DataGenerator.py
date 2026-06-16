@@ -32,12 +32,12 @@ def random_smooth_ic(n, m, sigma=3):
     return u0
 
 
-# initialConditions = {
-#     "heat": random_smooth_ic(len(x), 1).flatten(),
-#     "allen_cahn": random_smooth_ic(len(x), 1).flatten(),
-#     "nagumo": random_smooth_ic(len(x), 1).flatten(),
-#     "kdv": random_smooth_ic(len(x), 1).flatten(),
-# }
+initialConditionsRandom = {
+    "heat": random_smooth_ic(len(x), 1).flatten(),
+    "allen_cahn": random_smooth_ic(len(x), 1).flatten(),
+    "nagumo": random_smooth_ic(len(x), 1).flatten(),
+    "kdv": random_smooth_ic(len(x), 1).flatten(),
+}
 
 initialConditions = {
     "heat": list(
@@ -45,6 +45,7 @@ initialConditions = {
     ),  # sin(0)=0, sin(20*2pi/20)=sin(2pi)=0 - fixing period
     "allen_cahn": list(np.sin(2 * np.pi * x / L)),
     "nagumo": list(np.cos(2 * np.pi * x / L)),  # cos(0)=1, cos(2pi)=1
+    "kdv": list(np.sin(2 * np.pi * x / L)),
 }
 
 # normal heat update, but copying boundary conditions from matlab code (2x thing next to start/end)
@@ -134,7 +135,7 @@ def getParameters(method):
     return p
 
 
-def generateData(method=None):
+def generateData(method=None, randomConditions=False):
     if method is None:
         print("Please specify a system to generate data for.")
         return
@@ -151,7 +152,11 @@ def generateData(method=None):
     baseProblem = de.SDEProblem(
         driftEquations[method],
         jl.oned_noise_jl,
-        initialConditions.get(method, [0.0] * N),
+        (
+            initialConditions.get(method, [0.0] * N)
+            if not randomConditions
+            else initialConditionsRandom.get(method, [0.0] * N)
+        ),
         timeSpan,
         p,
     )
