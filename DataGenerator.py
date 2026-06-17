@@ -6,8 +6,6 @@ from scipy.ndimage import gaussian_filter
 import yaml
 import os
 
-np.random.seed(0)
-
 # parameters
 
 with open("parameters.yaml") as f:
@@ -25,9 +23,12 @@ timesteps = yamlParameters["common"]["timesteps"]
 dt = endTime / timesteps
 timeSpan = (yamlParameters["common"]["t_start"], endTime)
 
+# rng source
+rng = np.random.default_rng(0)
+
 
 def random_smooth_ic(n, m, sigma=3):
-    u0 = np.random.randn(n, m)
+    u0 = rng.standard_normal((n, m))
     u0 = gaussian_filter(u0, sigma=sigma)
     return u0
 
@@ -50,7 +51,6 @@ initialConditions = {
 
 # normal heat update, but copying boundary conditions from matlab code (2x thing next to start/end)
 jl.seval(f"""
-using Random; Random.seed!(0)
 
 function heat_drift_jl(du, u, p, t)
     epsilon, dx, sigma = p
@@ -107,6 +107,7 @@ function oned_noise_jl(du, u, p, t)
     end
 end
 """)
+
 # continuous (not scaling the noise by /sqrt(dx) to spread noise out - which would end with a higher estimate overall actually)
 
 
@@ -161,17 +162,16 @@ def generateData(method=None, randomConditions=False):
         p,
     )
     ensembleProblem = de.EnsembleProblem(baseProblem)
-    solution = de.solve(  # sr1w1 messed up diffusion estimates
+    jl.seval("import Random; Random.seed!(42)")
+    solution = de.solve(
         ensembleProblem,
-        de.SRIW1(),  # try with adaptive = false!!!!!
-        de.EnsembleThreads(),
+        de.SRIW1(),
+        de.EnsembleSerial(),  # hopefully doesn't take years but for reprod.
         trajectories=TOTAL_SAMPLES,
         adaptive=False,
         saveat=dt,
         dt=dt,
     )
-    # check in more detail how SRIW1 improves on EM
-
     # shape, matching Mathpati code, but not paper - minimal difference
     uStorage = np.zeros((N, timesteps + 1, TOTAL_SAMPLES))
     for sampleNo in range(TOTAL_SAMPLES):
@@ -189,7 +189,6 @@ def generateData(method=None, randomConditions=False):
     # second KM moment (diffusion squared estimate), shape (64, 500)
     xdiff = (1 / dt) * np.mean(y * y, axis=2)
 
-    # save in data/ directory, accounting for if the dir doesnt exist. create data/ if it doesn't exist
     dataDir = os.path.join("data")
     os.makedirs(dataDir, exist_ok=True)
 
@@ -206,6 +205,6 @@ def generateData(method=None, randomConditions=False):
         xdiff,
     )
 
-    print("uStorage shape:", uStorage.shape)  # (64, 501, 2000)
-    print("xdt shape:", xdt.shape)  # (64, 500)
-    print("xdiff shape:", xdiff.shape)  # (64, 500)
+    print("uStorage shape:", uStorage.shape)
+    print("xdt shape:", xdt.shape)
+    print("xdiff shape:", xdiff.shape)
