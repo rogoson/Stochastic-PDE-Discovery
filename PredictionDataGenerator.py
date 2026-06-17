@@ -6,8 +6,6 @@ import yaml
 from scipy.ndimage import gaussian_filter
 import os
 
-np.random.seed(0)
-
 with open("parameters.yaml") as f:
     yamlParameters = yaml.safe_load(f)
 
