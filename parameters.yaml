@@ -22,20 +22,20 @@ kdv:
     uu_x_coeff: -1
     u_xxx_coeff: -1
   discovered:
-    u_coeff: 0.01663
-    u_coeff_variance: 0.00024146
-    u2_coeff: -0.124552
-    u2_coeff_variance: 0.00149519
-    u3_coeff: -0.121455
-    u3_coeff_variance: 0.00190612
-    sigma_squared: 1.008194
-    sigma_squared_variance: 1.905e-05
-    epsilon: 0.075923
-    epsilon_variance: 3.306e-05
-    uu_x_coeff: -0.130901
-    uu_x_coeff_variance: 0.00080605
-    u_xxx_coeff: 1.002272
-    u_xxx_coeff_variance: 7.33e-06
+    u_coeff: -0.091047
+    u_coeff_variance: 0.00026191
+    u2_coeff: -0.075423
+    u2_coeff_variance: 0.00183837
+    u3_coeff: 0.346033
+    u3_coeff_variance: 0.0021917
+    sigma_squared: 0.99867
+    sigma_squared_variance: 1.976e-05
+    epsilon: -0.02949
+    epsilon_variance: 7.27e-06
+    uu_x_coeff: -0.055636
+    uu_x_coeff_variance: 0.00170467
+    u_xxx_coeff: -1.002173
+    u_xxx_coeff_variance: 1.312e-05
 heat:
   initial_condition: sin(x)
   correct:
