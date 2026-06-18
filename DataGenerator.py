@@ -83,7 +83,7 @@ function nagumo_drift_jl(du, u, p, t)
 end
 
 function kdv_drift_jl(du, u, p, t)
-    epsilon, dx, sigma, uu_x_coeff, u_xxx_coeff = p
+    dx, sigma, uu_x_coeff, u_xxx_coeff = p
     dx3 = dx^3
     du[1] = u_xxx_coeff * (u[3] - 2u[2] + 2u[{N}] - u[{N-1}]) / (2*dx3) +
             uu_x_coeff * u[1] * (u[2] - u[{N}]) / (2*dx)
@@ -112,24 +112,24 @@ end
 
 
 def getParameters(method):
-    epsilon = yamlParameters[method]["correct"]["epsilon"]
-    sigma = yamlParameters[method]["correct"]["sigma"]
+    epsilon = yamlParameters[method]["correct"]["drift"]["epsilon"]
+    sigma = yamlParameters[method]["correct"]["diffusion"]["sigma"]
     dx = yamlParameters["common"]["dx"]
     if method == "allen_cahn":
-        u_coeff = yamlParameters[method]["correct"]["u_coeff"]
-        u3_coeff = yamlParameters[method]["correct"]["u3_coeff"]
+        u_coeff = yamlParameters[method]["correct"]["drift"]["u_coeff"]
+        u3_coeff = yamlParameters[method]["correct"]["drift"]["u3_coeff"]
         p = (epsilon, dx, sigma, u_coeff, u3_coeff)
     elif method == "nagumo":
-        u_coeff = yamlParameters[method]["correct"]["u_coeff"]
-        u2_coeff = yamlParameters[method]["correct"]["u2_coeff"]
-        u3_coeff = yamlParameters[method]["correct"]["u3_coeff"]
+        u_coeff = yamlParameters[method]["correct"]["drift"]["u_coeff"]
+        u2_coeff = yamlParameters[method]["correct"]["drift"]["u2_coeff"]
+        u3_coeff = yamlParameters[method]["correct"]["drift"]["u3_coeff"]
         p = (epsilon, dx, sigma, u_coeff, u2_coeff, u3_coeff)
     elif method == "heat":
         p = (epsilon, dx, sigma)
     elif method == "kdv":
-        uu_x_coeff = yamlParameters[method]["correct"]["uu_x_coeff"]
-        u_xxx_coeff = yamlParameters[method]["correct"]["u_xxx_coeff"]
-        p = (epsilon, dx, sigma, uu_x_coeff, u_xxx_coeff)
+        uu_x_coeff = yamlParameters[method]["correct"]["drift"]["uu_x_coeff"]
+        u_xxx_coeff = yamlParameters[method]["correct"]["drift"]["u_xxx_coeff"]
+        p = (dx, sigma, uu_x_coeff, u_xxx_coeff)
     else:
         print("Unknown method: ", method)
         return

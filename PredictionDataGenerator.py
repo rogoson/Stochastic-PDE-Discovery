@@ -81,7 +81,7 @@ function nagumo_drift_jl(du, u, p, t)
 end
 
 function kdv_drift_jl(du, u, p, t)
-    epsilon, dx, sigma, uu_x_coeff, u_xxx_coeff = p
+    dx, sigma, uu_x_coeff, u_xxx_coeff = p
     dx3 = dx^3
     du[1] = u_xxx_coeff * (u[3] - 2u[2] + 2u[{N}] - u[{N-1}]) / (2*dx3) +
             uu_x_coeff * u[1] * (u[2] - u[{N}]) / (2*dx)
@@ -120,24 +120,24 @@ end
 
 
 def getParameters(method):
-    epsilon = yamlParameters[method]["correct"]["epsilon"]
-    sigma = yamlParameters[method]["correct"]["sigma"]
+    epsilon = yamlParameters[method]["correct"]["drift"]["epsilon"]
+    sigma = yamlParameters[method]["correct"]["diffusion"]["sigma"]
     dx = yamlParameters["common"]["dx"]
     if method == "allen_cahn":
-        u_coeff = yamlParameters[method]["correct"]["u_coeff"]
-        u3_coeff = yamlParameters[method]["correct"]["u3_coeff"]
+        u_coeff = yamlParameters[method]["correct"]["drift"]["u_coeff"]
+        u3_coeff = yamlParameters[method]["correct"]["drift"]["u3_coeff"]
         p = (epsilon, dx, sigma, u_coeff, u3_coeff)
     elif method == "nagumo":
-        u_coeff = yamlParameters[method]["correct"]["u_coeff"]
-        u2_coeff = yamlParameters[method]["correct"]["u2_coeff"]
-        u3_coeff = yamlParameters[method]["correct"]["u3_coeff"]
+        u_coeff = yamlParameters[method]["correct"]["drift"]["u_coeff"]
+        u2_coeff = yamlParameters[method]["correct"]["drift"]["u2_coeff"]
+        u3_coeff = yamlParameters[method]["correct"]["drift"]["u3_coeff"]
         p = (epsilon, dx, sigma, u_coeff, u2_coeff, u3_coeff)
     elif method == "heat":
         p = (epsilon, dx, sigma)
     elif method == "kdv":
-        uu_x_coeff = yamlParameters[method]["correct"]["uu_x_coeff"]
-        u_xxx_coeff = yamlParameters[method]["correct"]["u_xxx_coeff"]
-        p = (epsilon, dx, sigma, uu_x_coeff, u_xxx_coeff)
+        uu_x_coeff = yamlParameters[method]["correct"]["drift"]["uu_x_coeff"]
+        u_xxx_coeff = yamlParameters[method]["correct"]["drift"]["u_xxx_coeff"]
+        p = (dx, sigma, uu_x_coeff, u_xxx_coeff)
     else:
         print("Unknown method: ", method)
         return
@@ -152,7 +152,9 @@ def samplePredParameters(method, nSamples):
     masterRng = np.random.RandomState(42)
     if "kdv" not in method.lower():  # hopefully kdv doesn't discover heat coeff
         epsilon = masterRng.normal(
-            disc["epsilon"], np.sqrt(disc["epsilon_variance"]), nSamples
+            disc["drift"]["epsilon"],
+            np.sqrt(disc["drift"]["epsilon_variance"]),
+            nSamples,
         )
 
     # override dx for allen cahn, 400hz used instead of 500 in the paper
@@ -169,8 +171,8 @@ def samplePredParameters(method, nSamples):
         sigma = np.sqrt(
             np.abs(
                 masterRng.normal(
-                    disc["sigma_squared"],
-                    np.sqrt(disc["sigma_squared_variance"]),
+                    disc["diffusion"]["sigma_squared"],
+                    np.sqrt(disc["diffusion"]["sigma_squared_variance"]),
                     nSamples,
                 )
             )
@@ -180,17 +182,21 @@ def samplePredParameters(method, nSamples):
         sigma = np.sqrt(
             np.abs(
                 masterRng.normal(
-                    disc["sigma_squared"],
-                    np.sqrt(disc["sigma_squared_variance"]),
+                    disc["diffusion"]["sigma_squared"],
+                    np.sqrt(disc["diffusion"]["sigma_squared_variance"]),
                     nSamples,
                 )
             )
         )
         u_coeff = masterRng.normal(
-            disc["u_coeff"], np.sqrt(disc["u_coeff_variance"]), nSamples
+            disc["drift"]["u_coeff"],
+            np.sqrt(disc["drift"]["u_coeff_variance"]),
+            nSamples,
         )
         u3_coeff = masterRng.normal(
-            disc["u3_coeff"], np.sqrt(disc["u3_coeff_variance"]), nSamples
+            disc["drift"]["u3_coeff"],
+            np.sqrt(disc["drift"]["u3_coeff_variance"]),
+            nSamples,
         )
         return [
             (epsilon[i], dx, sigma[i], u_coeff[i], u3_coeff[i]) for i in range(nSamples)
@@ -199,20 +205,26 @@ def samplePredParameters(method, nSamples):
         sigma = np.sqrt(
             np.abs(
                 masterRng.normal(
-                    disc["sigma_squared"],
-                    np.sqrt(disc["sigma_squared_variance"]),
+                    disc["diffusion"]["sigma_squared"],
+                    np.sqrt(disc["diffusion"]["sigma_squared_variance"]),
                     nSamples,
                 )
             )
         )  # because it discovers the squared form
         u_coeff = masterRng.normal(
-            disc["u_coeff"], np.sqrt(disc["u_coeff_variance"]), nSamples
+            disc["drift"]["u_coeff"],
+            np.sqrt(disc["drift"]["u_coeff_variance"]),
+            nSamples,
         )
         u2_coeff = masterRng.normal(
-            disc["u2_coeff"], np.sqrt(disc["u2_coeff_variance"]), nSamples
+            disc["drift"]["u2_coeff"],
+            np.sqrt(disc["drift"]["u2_coeff_variance"]),
+            nSamples,
         )
         u3_coeff = masterRng.normal(
-            disc["u3_coeff"], np.sqrt(disc["u3_coeff_variance"]), nSamples
+            disc["drift"]["u3_coeff"],
+            np.sqrt(disc["drift"]["u3_coeff_variance"]),
+            nSamples,
         )
         return [
             (epsilon[i], dx, sigma[i], u_coeff[i], u2_coeff[i], u3_coeff[i])
@@ -222,22 +234,23 @@ def samplePredParameters(method, nSamples):
         sigma = np.sqrt(
             np.abs(
                 masterRng.normal(
-                    disc["sigma_squared"],
-                    np.sqrt(disc["sigma_squared_variance"]),
+                    disc["diffusion"]["sigma_squared"],
+                    np.sqrt(disc["diffusion"]["sigma_squared_variance"]),
                     nSamples,
                 )
             )
         )  # because it discovers the squared form
         uu_x_coeff = masterRng.normal(
-            disc["uu_x_coeff"], np.sqrt(disc["uu_x_coeff_variance"]), nSamples
+            disc["drift"]["uu_x_coeff"],
+            np.sqrt(disc["drift"]["uu_x_coeff_variance"]),
+            nSamples,
         )
         u_xxx_coeff = masterRng.normal(
-            disc["u_xxx_coeff"], np.sqrt(disc["u_xxx_coeff_variance"]), nSamples
+            disc["drift"]["u_xxx_coeff"],
+            np.sqrt(disc["drift"]["u_xxx_coeff_variance"]),
+            nSamples,
         )
-        return [
-            (epsilon[i], dx, sigma[i], uu_x_coeff[i], u_xxx_coeff[i])
-            for i in range(nSamples)
-        ]
+        return [(dx, sigma[i], uu_x_coeff[i], u_xxx_coeff[i]) for i in range(nSamples)]
 
 
 def generatePrediction(method=None):
