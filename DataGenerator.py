@@ -85,17 +85,17 @@ end
 function kdv_drift_jl(du, u, p, t)
     epsilon, dx, sigma, uu_x_coeff, u_xxx_coeff = p
     dx3 = dx^3
-    du[1] = u_xxx_coeff * (-u[3] + 2u[2] - 2u[{N}] + u[{N-1}]) / (2*dx3) +
+    du[1] = u_xxx_coeff * (u[3] - 2u[2] + 2u[{N}] - u[{N-1}]) / (2*dx3) +
             uu_x_coeff * u[1] * (u[2] - u[{N}]) / (2*dx)
-    du[2] = u_xxx_coeff * (-u[4] + 2u[3] - 2u[1] + u[{N}]) / (2*dx3) +
+    du[2] = u_xxx_coeff * (u[4] - 2u[3] + 2u[1] - u[{N}]) / (2*dx3) +
             uu_x_coeff * u[2] * (u[3] - u[1]) / (2*dx)
     for i in 3:{N-2}
-        du[i] = u_xxx_coeff * (-u[i+2] + 2u[i+1] - 2u[i-1] + u[i-2]) / (2*dx3) +
+        du[i] = u_xxx_coeff * (u[i+2] - 2u[i+1] + 2u[i-1] - u[i-2]) / (2*dx3) +
                 uu_x_coeff * u[i] * (u[i+1] - u[i-1]) / (2*dx)
     end
-    du[{N-1}] = u_xxx_coeff * (-u[1] + 2u[{N}] - 2u[{N-2}] + u[{N-3}]) / (2*dx3) +
+    du[{N-1}] = u_xxx_coeff * (u[1] - 2u[{N}] + 2u[{N-2}] - u[{N-3}]) / (2*dx3) +
                 uu_x_coeff * u[{N-1}] * (u[{N}] - u[{N-2}]) / (2*dx)
-    du[{N}] = u_xxx_coeff * (-u[2] + 2u[1] - 2u[{N-1}] + u[{N-2}]) / (2*dx3) +
+    du[{N}] = u_xxx_coeff * (u[2] - 2u[1] + 2u[{N-1}] - u[{N-2}]) / (2*dx3) +
               uu_x_coeff * u[{N}] * (u[1] - u[{N-1}]) / (2*dx)
 end
 

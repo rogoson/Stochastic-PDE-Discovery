@@ -22,34 +22,36 @@ kdv:
     uu_x_coeff: -1
     u_xxx_coeff: -1
   discovered:
-    u_coeff: 0.014142
-    u_coeff_variance: 0.00024169
-    u2_coeff: -0.124177
-    u2_coeff_variance: 0.00149249
-    u3_coeff: -0.128009
-    u3_coeff_variance: 0.00189891
-    sigma_squared: 1.007931
-    sigma_squared_variance: 1.894e-05
-    epsilon: 0.090983
-    epsilon_variance: 0.00015858
-    uu_x_coeff: -0.114628
-    uu_x_coeff_variance: 0.00076801
+    u_coeff: 0.01663
+    u_coeff_variance: 0.00024146
+    u2_coeff: -0.124552
+    u2_coeff_variance: 0.00149519
+    u3_coeff: -0.121455
+    u3_coeff_variance: 0.00190612
+    sigma_squared: 1.008194
+    sigma_squared_variance: 1.905e-05
+    epsilon: 0.075923
+    epsilon_variance: 3.306e-05
+    uu_x_coeff: -0.130901
+    uu_x_coeff_variance: 0.00080605
+    u_xxx_coeff: 1.002272
+    u_xxx_coeff_variance: 7.33e-06
 heat:
   initial_condition: sin(x)
   correct:
     epsilon: 1
     sigma: 1
   discovered:
-    epsilon: 0.992088
-    epsilon_variance: 0.00044861
-    sigma_squared: 0.967829
-    sigma_squared_variance: 4.01e-06
-    u_coeff: -0.093625
-    u_coeff_variance: 0.01954138
-    u3_coeff: 0.052424
-    u3_coeff_variance: 0.00108358
-    u2_coeff: 0.386466
-    u2_coeff_variance: 0.11597928
+    epsilon: 0.994185
+    epsilon_variance: 0.00044865
+    sigma_squared: 0.967907
+    sigma_squared_variance: 4.02e-06
+    u_coeff: -0.118676
+    u_coeff_variance: 0.01964809
+    u3_coeff: 0.052776
+    u3_coeff_variance: 0.0010849
+    u2_coeff: 0.326872
+    u2_coeff_variance: 0.11831205
 allen_cahn:
   initial_condition: sin(x)
   correct:
@@ -58,20 +60,20 @@ allen_cahn:
     u_coeff: 1
     u3_coeff: -1
   discovered:
-    epsilon: 0.98711
-    epsilon_variance: 0.00048831
-    u_coeff: 0.01144
-    u_coeff_variance: 7.42e-05
-    u3_coeff: -0.046192
-    u3_coeff_variance: 0.00380088
+    epsilon: 0.985445
+    epsilon_variance: 0.00051318
+    u_coeff: 0.013745
+    u_coeff_variance: 7.466e-05
+    u3_coeff: -0.062581
+    u3_coeff_variance: 0.00383865
     sigma: null
     sigma_variance: null
-    sigma_squared: 0.970061
-    sigma_squared_variance: 2.75e-06
-    u2_coeff: -0.054002
-    u2_coeff_variance: 0.00076707
-    uu_x_coeff: -0.024249
-    uu_x_coeff_variance: 0.00035823
+    sigma_squared: 0.97026
+    sigma_squared_variance: 2.86e-06
+    u2_coeff: -0.033787
+    u2_coeff_variance: 0.00079065
+    uu_x_coeff: -0.026263
+    uu_x_coeff_variance: 0.00035963
 nagumo:
   initial_condition: cos(x)
   correct:
@@ -82,17 +84,19 @@ nagumo:
     u2_coeff: 0.5
     u3_coeff: -1
   discovered:
-    epsilon: 0.964243
-    epsilon_variance: 0.0006997
-    u_coeff: -0.015177
-    u_coeff_variance: 0.00013709
-    u2_coeff: 0.430772
-    u2_coeff_variance: 0.23160076
-    u3_coeff: 0.025079
-    u3_coeff_variance: 0.00475107
+    epsilon: 0.968299
+    epsilon_variance: 0.00071019
+    u_coeff: -0.014192
+    u_coeff_variance: 0.00013883
+    u2_coeff: 0.523952
+    u2_coeff_variance: 0.23279924
+    u3_coeff: 0.021357
+    u3_coeff_variance: 0.00481937
     sigma: null
     sigma_variance: null
-    sigma_squared: 0.96713
-    sigma_squared_variance: 5.91e-06
-    uu_x_coeff: 0.013678
-    uu_x_coeff_variance: 0.00038402
+    sigma_squared: 0.967088
+    sigma_squared_variance: 5.95e-06
+    uu_x_coeff: 0.014653
+    uu_x_coeff_variance: 0.00047707
+    u_xxx_coeff: 0.055278
+    u_xxx_coeff_variance: 0.00042305
