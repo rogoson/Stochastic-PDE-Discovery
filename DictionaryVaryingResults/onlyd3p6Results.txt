@@ -1,0 +1,203 @@
+Variational Bayes results:
+
+<table>
+<thead>
+<tr><th>Problem               </th><th>Term    </th><th style="text-align: right;">   Mean</th><th style="text-align: right;">  Variance</th></tr>
+</thead>
+<tbody>
+<tr><td>Heat | Drift          </td><td>1       </td><td style="text-align: right;">-0.0244</td><td style="text-align: right;">  0.000947</td></tr>
+<tr><td>Heat | Drift          </td><td>u       </td><td style="text-align: right;">-0.0594</td><td style="text-align: right;">  0.020287</td></tr>
+<tr><td>Heat | Drift          </td><td>u^2     </td><td style="text-align: right;"> 0.3953</td><td style="text-align: right;">  0.113507</td></tr>
+<tr><td>Heat | Drift          </td><td>u^3     </td><td style="text-align: right;"> 0.3764</td><td style="text-align: right;">  0.279078</td></tr>
+<tr><td>Heat | Drift          </td><td>u^4     </td><td style="text-align: right;">-0.3098</td><td style="text-align: right;">  0.370702</td></tr>
+<tr><td>Heat | Drift          </td><td>u^5     </td><td style="text-align: right;">-0.7037</td><td style="text-align: right;">  0.359332</td></tr>
+<tr><td>Heat | Drift          </td><td>u^6     </td><td style="text-align: right;"> 0.2486</td><td style="text-align: right;">  0.165431</td></tr>
+<tr><td>Heat | Drift          </td><td>u_xx    </td><td style="text-align: right;"> 0.9914</td><td style="text-align: right;">  0.000533</td></tr>
+<tr><td>Heat | Drift          </td><td>uu_xx   </td><td style="text-align: right;">-0.0817</td><td style="text-align: right;">  0.006436</td></tr>
+<tr><td>Heat | Drift          </td><td>u^2u_xx </td><td style="text-align: right;"> 0.1524</td><td style="text-align: right;">  0.043926</td></tr>
+<tr><td>Heat | Drift          </td><td>u^3u_xx </td><td style="text-align: right;"> 0.4579</td><td style="text-align: right;">  0.092606</td></tr>
+<tr><td>Heat | Drift          </td><td>u^4u_xx </td><td style="text-align: right;">-0.3116</td><td style="text-align: right;">  0.120418</td></tr>
+<tr><td>Heat | Drift          </td><td>u^5u_xx </td><td style="text-align: right;">-0.1972</td><td style="text-align: right;">  0.067053</td></tr>
+<tr><td>Heat | Drift          </td><td>u^6u_xx </td><td style="text-align: right;"> 0.0477</td><td style="text-align: right;">  0.029027</td></tr>
+<tr><td>Heat | Drift          </td><td>u^3u_xxx</td><td style="text-align: right;">-0.1761</td><td style="text-align: right;">  0.015794</td></tr>
+<tr><td>Heat | Drift          </td><td>u^4u_xxx</td><td style="text-align: right;"> 0.2331</td><td style="text-align: right;">  0.013942</td></tr>
+<tr><td>Heat | Drift          </td><td>u^5u_xxx</td><td style="text-align: right;"> 0.1559</td><td style="text-align: right;">  0.017842</td></tr>
+<tr><td>Heat | Drift          </td><td>u^6u_xxx</td><td style="text-align: right;">-0.1183</td><td style="text-align: right;">  0.009382</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u       </td><td style="text-align: right;"> 0.5831</td><td style="text-align: right;">  0.035186</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^2     </td><td style="text-align: right;"> 0.4373</td><td style="text-align: right;">  0.242783</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^3     </td><td style="text-align: right;">-1.253 </td><td style="text-align: right;">  1.18156 </td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^4     </td><td style="text-align: right;"> 1.0603</td><td style="text-align: right;">  3.46312 </td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^5     </td><td style="text-align: right;">-0.267 </td><td style="text-align: right;">  1.68972 </td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^6     </td><td style="text-align: right;">-1.6305</td><td style="text-align: right;">  3.38793 </td></tr>
+<tr><td>Nagumo | Drift        </td><td>u_x     </td><td style="text-align: right;"> 0.0831</td><td style="text-align: right;">  0.002508</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^2u_x  </td><td style="text-align: right;">-0.9556</td><td style="text-align: right;">  0.308931</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^6u_x  </td><td style="text-align: right;"> 2.0091</td><td style="text-align: right;">  1.89543 </td></tr>
+<tr><td>Nagumo | Drift        </td><td>u_xx    </td><td style="text-align: right;"> 0.9715</td><td style="text-align: right;">  0.000721</td></tr>
+<tr><td>Nagumo | Drift        </td><td>uu_xx   </td><td style="text-align: right;"> 0.0557</td><td style="text-align: right;">  0.011594</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^2u_xx </td><td style="text-align: right;"> 0.3203</td><td style="text-align: right;">  0.087769</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^3u_xx </td><td style="text-align: right;">-0.0165</td><td style="text-align: right;">  0.260421</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^4u_xx </td><td style="text-align: right;">-0.7866</td><td style="text-align: right;">  0.641293</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^5u_xx </td><td style="text-align: right;">-0.1424</td><td style="text-align: right;">  0.295917</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^6u_xx </td><td style="text-align: right;"> 0.2606</td><td style="text-align: right;">  0.260417</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u_xxx   </td><td style="text-align: right;"> 0.0633</td><td style="text-align: right;">  0.000503</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^2u_xxx</td><td style="text-align: right;">-0.5878</td><td style="text-align: right;">  0.0397  </td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^4u_xxx</td><td style="text-align: right;"> 0.7545</td><td style="text-align: right;">  0.064619</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>1       </td><td style="text-align: right;">-0.0281</td><td style="text-align: right;">  0.001271</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u       </td><td style="text-align: right;"> 1.3036</td><td style="text-align: right;">  0.027667</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^2     </td><td style="text-align: right;"> 0.2029</td><td style="text-align: right;">  0.237605</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^3     </td><td style="text-align: right;">-2.5674</td><td style="text-align: right;">  1.02749 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^4     </td><td style="text-align: right;"> 1.3403</td><td style="text-align: right;">  2.29913 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^5     </td><td style="text-align: right;"> 1.386 </td><td style="text-align: right;">  1.02777 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^6     </td><td style="text-align: right;">-1.4132</td><td style="text-align: right;">  1.75454 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>uu_x    </td><td style="text-align: right;"> 0.6512</td><td style="text-align: right;">  0.15663 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^2u_x  </td><td style="text-align: right;"> 0.6622</td><td style="text-align: right;">  0.365242</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^3u_x  </td><td style="text-align: right;">-3.0293</td><td style="text-align: right;">  5.15673 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^4u_x  </td><td style="text-align: right;">-3.415 </td><td style="text-align: right;">  6.73803 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^5u_x  </td><td style="text-align: right;"> 2.0111</td><td style="text-align: right;">  5.45294 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^6u_x  </td><td style="text-align: right;"> 2.2527</td><td style="text-align: right;">  4.60359 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u_xx    </td><td style="text-align: right;"> 0.9852</td><td style="text-align: right;">  0.000751</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>uu_xx   </td><td style="text-align: right;">-0.0767</td><td style="text-align: right;">  0.010555</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^2u_xx </td><td style="text-align: right;"> 0.2948</td><td style="text-align: right;">  0.069334</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^3u_xx </td><td style="text-align: right;"> 0.4268</td><td style="text-align: right;">  0.247404</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^4u_xx </td><td style="text-align: right;">-0.7015</td><td style="text-align: right;">  0.40033 </td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^5u_xx </td><td style="text-align: right;">-0.1783</td><td style="text-align: right;">  0.180172</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^6u_xx </td><td style="text-align: right;"> 0.4001</td><td style="text-align: right;">  0.130486</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>uu_xxx  </td><td style="text-align: right;"> 0.1928</td><td style="text-align: right;">  0.009107</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^3u_xxx</td><td style="text-align: right;">-0.7309</td><td style="text-align: right;">  0.123974</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^5u_xxx</td><td style="text-align: right;"> 0.4942</td><td style="text-align: right;">  0.068716</td></tr>
+<tr><td>KdV | Drift           </td><td>u       </td><td style="text-align: right;"> 0.042 </td><td style="text-align: right;">  0.001859</td></tr>
+<tr><td>KdV | Drift           </td><td>u^2     </td><td style="text-align: right;"> 0.2402</td><td style="text-align: right;">  0.01311 </td></tr>
+<tr><td>KdV | Drift           </td><td>u^3     </td><td style="text-align: right;"> 0.2361</td><td style="text-align: right;">  0.015367</td></tr>
+<tr><td>KdV | Drift           </td><td>u^4     </td><td style="text-align: right;">-0.1477</td><td style="text-align: right;">  0.008781</td></tr>
+<tr><td>KdV | Drift           </td><td>u^5     </td><td style="text-align: right;">-0.0322</td><td style="text-align: right;">  0.000958</td></tr>
+<tr><td>KdV | Drift           </td><td>u^6     </td><td style="text-align: right;"> 0.0167</td><td style="text-align: right;">  0.000198</td></tr>
+<tr><td>KdV | Drift           </td><td>uu_x    </td><td style="text-align: right;">-0.9386</td><td style="text-align: right;">  0.005117</td></tr>
+<tr><td>KdV | Drift           </td><td>u^3u_x  </td><td style="text-align: right;">-0.1037</td><td style="text-align: right;">  0.003163</td></tr>
+<tr><td>KdV | Drift           </td><td>u^5u_x  </td><td style="text-align: right;"> 0.014 </td><td style="text-align: right;">  4.3e-05 </td></tr>
+<tr><td>KdV | Drift           </td><td>u_xx    </td><td style="text-align: right;"> 0.0862</td><td style="text-align: right;">  5.1e-05 </td></tr>
+<tr><td>KdV | Drift           </td><td>uu_xx   </td><td style="text-align: right;"> 0.0129</td><td style="text-align: right;">  3.2e-05 </td></tr>
+<tr><td>KdV | Drift           </td><td>u^2u_xx </td><td style="text-align: right;"> 0.0193</td><td style="text-align: right;">  8.1e-05 </td></tr>
+<tr><td>KdV | Drift           </td><td>u_xxx   </td><td style="text-align: right;">-0.9961</td><td style="text-align: right;">  1e-05   </td></tr>
+<tr><td>Heat | Diffusion      </td><td>1       </td><td style="text-align: right;"> 0.9677</td><td style="text-align: right;">  4e-06   </td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^3     </td><td style="text-align: right;"> 0.054 </td><td style="text-align: right;">  0.001097</td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^4     </td><td style="text-align: right;">-0.0756</td><td style="text-align: right;">  0.001468</td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^5     </td><td style="text-align: right;">-0.0627</td><td style="text-align: right;">  0.001453</td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^6     </td><td style="text-align: right;"> 0.0807</td><td style="text-align: right;">  0.00064 </td></tr>
+<tr><td>Heat | Diffusion      </td><td>uu_x    </td><td style="text-align: right;">-0.0114</td><td style="text-align: right;">  0.000333</td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^2u_x  </td><td style="text-align: right;"> 0.0269</td><td style="text-align: right;">  0.00082 </td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^3u_x  </td><td style="text-align: right;">-0.0336</td><td style="text-align: right;">  0.008807</td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^4u_x  </td><td style="text-align: right;">-0.026 </td><td style="text-align: right;">  0.01002 </td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^5u_x  </td><td style="text-align: right;"> 0.1074</td><td style="text-align: right;">  0.00866 </td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^6u_x  </td><td style="text-align: right;">-0.0453</td><td style="text-align: right;">  0.00608 </td></tr>
+<tr><td>Heat | Diffusion      </td><td>uu_xx   </td><td style="text-align: right;">-0.0256</td><td style="text-align: right;">  2.6e-05 </td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^2u_xx </td><td style="text-align: right;"> 0.0149</td><td style="text-align: right;">  0.000135</td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^3u_xx </td><td style="text-align: right;">-0.018 </td><td style="text-align: right;">  0.00037 </td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^4u_xx </td><td style="text-align: right;">-0.023 </td><td style="text-align: right;">  0.000428</td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^5u_xx </td><td style="text-align: right;"> 0.0185</td><td style="text-align: right;">  0.000269</td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^3u_xxx</td><td style="text-align: right;"> 0.0179</td><td style="text-align: right;">  0.000405</td></tr>
+<tr><td>Heat | Diffusion      </td><td>u^4u_xxx</td><td style="text-align: right;">-0.0208</td><td style="text-align: right;">  0.000482</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>1       </td><td style="text-align: right;"> 0.9679</td><td style="text-align: right;">  6e-06   </td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u       </td><td style="text-align: right;">-0.0114</td><td style="text-align: right;">  0.000142</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^2     </td><td style="text-align: right;">-0.0397</td><td style="text-align: right;">  0.000974</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^3     </td><td style="text-align: right;"> 0.0486</td><td style="text-align: right;">  0.004745</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^4     </td><td style="text-align: right;"> 0.0675</td><td style="text-align: right;">  0.013895</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^5     </td><td style="text-align: right;">-0.044 </td><td style="text-align: right;">  0.006792</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^6     </td><td style="text-align: right;"> 0.0789</td><td style="text-align: right;">  0.0136  </td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^2u_x  </td><td style="text-align: right;">-0.0141</td><td style="text-align: right;">  0.004513</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^4u_x  </td><td style="text-align: right;">-0.0403</td><td style="text-align: right;">  0.045431</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^5u_x  </td><td style="text-align: right;">-0.0227</td><td style="text-align: right;">  0.027853</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^6u_x  </td><td style="text-align: right;"> 0.0368</td><td style="text-align: right;">  0.035269</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>uu_xx   </td><td style="text-align: right;">-0.0306</td><td style="text-align: right;">  4.7e-05 </td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^2u_xx </td><td style="text-align: right;">-0.0207</td><td style="text-align: right;">  0.000353</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^4u_xx </td><td style="text-align: right;"> 0.0672</td><td style="text-align: right;">  0.002576</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^5u_xx </td><td style="text-align: right;"> 0.0487</td><td style="text-align: right;">  0.001187</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^6u_xx </td><td style="text-align: right;">-0.0423</td><td style="text-align: right;">  0.001047</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^2u_xxx</td><td style="text-align: right;"> 0.0108</td><td style="text-align: right;">  0.000161</td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>u^4u_xxx</td><td style="text-align: right;">-0.0212</td><td style="text-align: right;">  0.001484</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>1       </td><td style="text-align: right;"> 0.9699</td><td style="text-align: right;">  5e-06   </td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u       </td><td style="text-align: right;"> 0.0178</td><td style="text-align: right;">  0.000105</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^2     </td><td style="text-align: right;">-0.023 </td><td style="text-align: right;">  0.000931</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^3     </td><td style="text-align: right;">-0.079 </td><td style="text-align: right;">  0.004105</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^4     </td><td style="text-align: right;"> 0.0488</td><td style="text-align: right;">  0.009208</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>uu_x    </td><td style="text-align: right;">-0.0299</td><td style="text-align: right;">  0.000502</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^2u_x  </td><td style="text-align: right;">-0.0738</td><td style="text-align: right;">  0.005224</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^3u_x  </td><td style="text-align: right;"> 0.3149</td><td style="text-align: right;">  0.017067</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^4u_x  </td><td style="text-align: right;"> 0.1069</td><td style="text-align: right;">  0.044767</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^5u_x  </td><td style="text-align: right;">-0.3904</td><td style="text-align: right;">  0.017849</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^6u_x  </td><td style="text-align: right;">-0.015 </td><td style="text-align: right;">  0.025518</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>uu_xx   </td><td style="text-align: right;">-0.0253</td><td style="text-align: right;">  4.2e-05 </td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^2u_xx </td><td style="text-align: right;"> 0.0236</td><td style="text-align: right;">  0.000196</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^4u_xx </td><td style="text-align: right;">-0.0498</td><td style="text-align: right;">  0.001466</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^5u_xx </td><td style="text-align: right;"> 0.0166</td><td style="text-align: right;">  0.000722</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^2u_xxx</td><td style="text-align: right;">-0.0121</td><td style="text-align: right;">  0.000146</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^4u_xxx</td><td style="text-align: right;"> 0.0501</td><td style="text-align: right;">  0.001016</td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>u^6u_xxx</td><td style="text-align: right;">-0.0342</td><td style="text-align: right;">  0.000346</td></tr>
+<tr><td>KdV | Diffusion       </td><td>1       </td><td style="text-align: right;"> 1.0094</td><td style="text-align: right;">  2.1e-05 </td></tr>
+<tr><td>KdV | Diffusion       </td><td>u       </td><td style="text-align: right;">-0.0541</td><td style="text-align: right;">  0.00027 </td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^2     </td><td style="text-align: right;">-0.3138</td><td style="text-align: right;">  0.00191 </td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^3     </td><td style="text-align: right;"> 0.182 </td><td style="text-align: right;">  0.00223 </td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^4     </td><td style="text-align: right;"> 0.1361</td><td style="text-align: right;">  0.00128 </td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^5     </td><td style="text-align: right;">-0.0358</td><td style="text-align: right;">  0.000139</td></tr>
+<tr><td>KdV | Diffusion       </td><td>u_x     </td><td style="text-align: right;">-0.064 </td><td style="text-align: right;">  0.000148</td></tr>
+<tr><td>KdV | Diffusion       </td><td>uu_x    </td><td style="text-align: right;">-0.079 </td><td style="text-align: right;">  0.000899</td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^2u_x  </td><td style="text-align: right;">-0.1003</td><td style="text-align: right;">  0.001676</td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^3u_x  </td><td style="text-align: right;">-0.054 </td><td style="text-align: right;">  0.000569</td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^4u_x  </td><td style="text-align: right;">-0.011 </td><td style="text-align: right;">  0.000236</td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^5u_x  </td><td style="text-align: right;"> 0.0194</td><td style="text-align: right;">  1.1e-05 </td></tr>
+<tr><td>KdV | Diffusion       </td><td>u_xx    </td><td style="text-align: right;">-0.0293</td><td style="text-align: right;">  7e-06   </td></tr>
+<tr><td>KdV | Diffusion       </td><td>uu_xx   </td><td style="text-align: right;">-0.2797</td><td style="text-align: right;">  5e-06   </td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^2u_xx </td><td style="text-align: right;"> 0.0237</td><td style="text-align: right;">  1.2e-05 </td></tr>
+</tbody>
+</table>
+
+
+
+SINDY:
+
+SINDy discovered terms (Heat | Drift):
+  u_xx: 1.0091
+
+SINDy discovered terms (Nagumo | Drift):
+  u: 0.4221
+  u^3: -0.7576
+  u^4: 2.8475
+  u^6: -2.7025
+  u^3u_x: -0.5174
+  u^4u_x: -3.3087
+  u^6u_x: 5.5531
+  u_xx: 0.9643
+  u^4u_xxx: -0.3653
+  u^6u_xxx: 0.5757
+
+SINDy discovered terms (Allen_Cahn | Drift):
+  u: 1.2712
+  u^3: -2.0709
+  u^4: 0.3794
+  u^5: 0.9916
+  u^6: -0.508
+  u^2u_x: 1.2431
+  u^3u_x: 0.3304
+  u^4u_x: -6.3955
+  u^5u_x: -0.7655
+  u^6u_x: 4.5853
+  u_xx: 0.9727
+  u^2u_xx: 0.3371
+  u^4u_xx: -0.6229
+  u^6u_xx: 0.3598
+
+SINDy discovered terms (KdV | Drift):
+  uu_x: -1.0124
+  u_xxx: -0.996
+
+SINDy discovered terms (Heat | Diffusion):
+  1: 0.9787
+
+SINDy discovered terms (Nagumo | Diffusion):
+  1: 0.9786
+
+SINDy discovered terms (Allen_Cahn | Diffusion):
+  1: 0.9792
+
+SINDy discovered terms (KdV | Diffusion):
+  1: 0.9759
+  uu_xx: -0.2701
