@@ -29,7 +29,7 @@ rng = np.random.default_rng(0)
 
 def random_smooth_ic(n, m, sigma=3):
     u0 = rng.standard_normal((n, m))
-    u0 = gaussian_filter(u0, sigma=sigma)
+    u0 = gaussian_filter(u0, sigma=sigma, mode="wrap")
     return u0
 
 

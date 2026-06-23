@@ -153,8 +153,113 @@ def FiniteDiff(u, dx, d, periodic=False):
             ) / dx**3
         return ux
 
-    if d > 3:
-        return FiniteDiff(FiniteDiff(u, dx, 3, periodic), dx, d - 3, periodic)
+    if d == 4:
+        for i in range(2, n - 2):
+            ux[i] = (
+                u[i + 2] - 4 * u[i + 1] + 6 * u[i] - 4 * u[i - 1] + u[i - 2]
+            ) / dx**4
+
+        if periodic:
+            ux[0] = (u[2] - 4 * u[1] + 6 * u[0] - 4 * u[n - 1] + u[n - 2]) / dx**4
+            ux[1] = (u[3] - 4 * u[2] + 6 * u[1] - 4 * u[0] + u[n - 1]) / dx**4
+            ux[n - 1] = (
+                u[1] - 4 * u[0] + 6 * u[n - 1] - 4 * u[n - 2] + u[n - 3]
+            ) / dx**4
+            ux[n - 2] = (
+                u[0] - 4 * u[n - 1] + 6 * u[n - 2] - 4 * u[n - 3] + u[n - 4]
+            ) / dx**4
+        else:
+            ux[0] = (
+                3 * u[0] - 14 * u[1] + 26 * u[2] - 24 * u[3] + 11 * u[4] - 2 * u[5]
+            ) / dx**4
+            ux[1] = (
+                3 * u[1] - 14 * u[2] + 26 * u[3] - 24 * u[4] + 11 * u[5] - 2 * u[6]
+            ) / dx**4
+            ux[n - 1] = (
+                -3 * u[n - 1]
+                + 14 * u[n - 2]
+                - 26 * u[n - 3]
+                + 24 * u[n - 4]
+                - 11 * u[n - 5]
+                + 2 * u[n - 6]
+            ) / dx**4
+            ux[n - 2] = (
+                -3 * u[n - 2]
+                + 14 * u[n - 3]
+                - 26 * u[n - 4]
+                + 24 * u[n - 5]
+                - 11 * u[n - 6]
+                + 2 * u[n - 7]
+            ) / dx**4
+
+    if d == 5:
+        for i in range(3, n - 3):
+            ux[i] = (
+                0.5 * u[i + 3]
+                - 2 * u[i + 2]
+                + 2.5 * u[i + 1]
+                - 2.5 * u[i - 1]
+                + 2 * u[i - 2]
+                - 0.5 * u[i - 3]
+            ) / dx**5
+
+        if periodic:
+            ux[0] = (
+                0.5 * u[3]
+                - 2 * u[2]
+                + 2.5 * u[1]
+                - 2.5 * u[n - 1]
+                + 2 * u[n - 2]
+                - 0.5 * u[n - 3]
+            ) / dx**5
+            ux[1] = (
+                0.5 * u[4]
+                - 2 * u[3]
+                + 2.5 * u[2]
+                - 2.5 * u[0]
+                + 2 * u[n - 1]
+                - 0.5 * u[n - 2]
+            ) / dx**5
+            ux[2] = (
+                0.5 * u[5]
+                - 2 * u[4]
+                + 2.5 * u[3]
+                - 2.5 * u[1]
+                + 2 * u[0]
+                - 0.5 * u[n - 1]
+            ) / dx**5
+            ux[n - 1] = (
+                0.5 * u[2]
+                - 2 * u[1]
+                + 2.5 * u[0]
+                - 2.5 * u[n - 2]
+                + 2 * u[n - 3]
+                - 0.5 * u[n - 4]
+            ) / dx**5
+            ux[n - 2] = (
+                0.5 * u[1]
+                - 2 * u[0]
+                + 2.5 * u[n - 1]
+                - 2.5 * u[n - 3]
+                + 2 * u[n - 4]
+                - 0.5 * u[n - 5]
+            ) / dx**5
+            ux[n - 3] = (
+                0.5 * u[0]
+                - 2 * u[n - 1]
+                + 2.5 * u[n - 2]
+                - 2.5 * u[n - 4]
+                + 2 * u[n - 5]
+                - 0.5 * u[n - 6]
+            ) / dx**5
+        else:
+            raise ValueError(
+                "5th derivative not implemented for non-periodic boundary conditions. Stencil not found."
+            )
+    return ux
+
+    if d > 5:
+        return FiniteDiff(FiniteDiff(u, dx, 5, periodic), dx, d - 5, periodic)
 
 
 def build_linear_system(
@@ -463,7 +568,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
 
             if cvg < 0 and verbosity:
                 print("OOPS!  log(like) decreasing!!")
-            elif abs(cvg) < tol or iter_ > max_iter:  # abs() to handle numerical noise
+            elif cvg < tol or iter_ > max_iter:
                 converged = 1
                 LL = LL[0:iter_]
 

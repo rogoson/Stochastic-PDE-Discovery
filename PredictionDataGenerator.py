@@ -23,12 +23,6 @@ K = 10  # use 10 chebyschev terms
 xCheb = 2 * x / L - 1
 
 
-def random_smooth_ic(n, m, sigma=3):
-    u0 = np.random.randn(n, m)
-    u0 = gaussian_filter(u0, sigma=sigma)
-    return u0
-
-
 def chebyschevInitial(xCheb, K, rng):  # mixture of chebyschev initials
     T = np.polynomial.chebyshev.chebvander(
         xCheb, K
