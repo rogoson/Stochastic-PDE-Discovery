@@ -90,8 +90,8 @@ def Lasso(X0, Y, lam, w=None, maxit=100, normalize=2):
 
 def FiniteDiff(u, dx, d, periodic=False):
     """
-    Takes dth derivative data using 2nd order finite difference method (up to d=3)
-    Works but with poor accuracy for d > 3
+    Takes dth derivative data using 2nd order finite difference method (up to d=6)
+    Works but with poor accuracy for d > 6
 
     Input:
     u = data to be differentiated
@@ -169,28 +169,9 @@ def FiniteDiff(u, dx, d, periodic=False):
                 u[0] - 4 * u[n - 1] + 6 * u[n - 2] - 4 * u[n - 3] + u[n - 4]
             ) / dx**4
         else:
-            ux[0] = (
-                3 * u[0] - 14 * u[1] + 26 * u[2] - 24 * u[3] + 11 * u[4] - 2 * u[5]
-            ) / dx**4
-            ux[1] = (
-                3 * u[1] - 14 * u[2] + 26 * u[3] - 24 * u[4] + 11 * u[5] - 2 * u[6]
-            ) / dx**4
-            ux[n - 1] = (
-                -3 * u[n - 1]
-                + 14 * u[n - 2]
-                - 26 * u[n - 3]
-                + 24 * u[n - 4]
-                - 11 * u[n - 5]
-                + 2 * u[n - 6]
-            ) / dx**4
-            ux[n - 2] = (
-                -3 * u[n - 2]
-                + 14 * u[n - 3]
-                - 26 * u[n - 4]
-                + 24 * u[n - 5]
-                - 11 * u[n - 6]
-                + 2 * u[n - 7]
-            ) / dx**4
+            raise ValueError(
+                "4th derivative not implemented for non-periodic boundary conditions. Stencil not found."
+            )
 
     if d == 5:
         for i in range(3, n - 3):
@@ -256,10 +237,83 @@ def FiniteDiff(u, dx, d, periodic=False):
             raise ValueError(
                 "5th derivative not implemented for non-periodic boundary conditions. Stencil not found."
             )
-    return ux
 
-    if d > 5:
-        return FiniteDiff(FiniteDiff(u, dx, 5, periodic), dx, d - 5, periodic)
+    if d == 6:
+
+        for i in range(3, n - 3):
+            ux[i] = (
+                1 * u[i + 3]
+                - 6 * u[i + 2]
+                + 15 * u[i + 1]
+                - 20 * u[i]
+                + 15 * u[i - 1]
+                - 6 * u[i - 2]
+                + 1 * u[i - 3]
+            ) / dx**6
+
+        if periodic:
+            ux[0] = (
+                1 * u[3]
+                - 6 * u[2]
+                + 15 * u[1]
+                - 20 * u[0]
+                + 15 * u[n - 1]
+                - 6 * u[n - 2]
+                + 1 * u[n - 3]
+            ) / dx**6
+            ux[1] = (
+                1 * u[4]
+                - 6 * u[3]
+                + 15 * u[2]
+                - 20 * u[1]
+                + 15 * u[0]
+                - 6 * u[n - 1]
+                + 1 * u[n - 2]
+            ) / dx**6
+            ux[2] = (
+                1 * u[5]
+                - 6 * u[4]
+                + 15 * u[3]
+                - 20 * u[2]
+                + 15 * u[1]
+                - 6 * u[0]
+                + 1 * u[n - 1]
+            ) / dx**6
+            ux[n - 1] = (
+                1 * u[2]
+                - 6 * u[1]
+                + 15 * u[0]
+                - 20 * u[n - 1]
+                + 15 * u[n - 2]
+                - 6 * u[n - 3]
+                + 1 * u[n - 4]
+            ) / dx**6
+            ux[n - 2] = (
+                1 * u[1]
+                - 6 * u[0]
+                + 15 * u[n - 1]
+                - 20 * u[n - 2]
+                + 15 * u[n - 3]
+                - 6 * u[n - 4]
+                + 1 * u[n - 5]
+            ) / dx**6
+            ux[n - 3] = (
+                1 * u[0]
+                - 6 * u[n - 1]
+                + 15 * u[n - 2]
+                - 20 * u[n - 3]
+                + 15 * u[n - 4]
+                - 6 * u[n - 5]
+                + 1 * u[n - 6]
+            ) / dx**6
+        else:
+            raise ValueError(
+                "6th derivative not implemented for non-periodic boundary conditions. Stencil not found."
+            )
+
+    if d > 6:
+        return FiniteDiff(FiniteDiff(u, dx, 6, periodic), dx, d - 6, periodic)
+    return ux
 
 
 def build_linear_system(
