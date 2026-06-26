@@ -92,6 +92,7 @@ def FiniteDiff(u, dx, d, periodic=False):
     """
     Takes dth derivative data using 2nd order finite difference method (up to d=6)
     Works but with poor accuracy for d > 6
+    Coeffs from https://web.media.mit.edu/~crtaylor/calculator.html [retrieved: 24/06/2026]
 
     Input:
     u = data to be differentiated
