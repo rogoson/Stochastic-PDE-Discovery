@@ -1,0 +1,31 @@
+
+<table>
+<thead>
+<tr><th>Problem               </th><th>Term   </th><th style="text-align: right;">   Mean</th><th style="text-align: right;">  Variance</th></tr>
+</thead>
+<tbody>
+<tr><td>Heat | Drift          </td><td>u_xx   </td><td style="text-align: right;"> 0.9885</td><td style="text-align: right;">  0.000352</td></tr>
+<tr><td>Heat | Drift          </td><td>u^2u_xx</td><td style="text-align: right;"> 0.0682</td><td style="text-align: right;">  0.001252</td></tr>
+<tr><td>Heat | Drift          </td><td>u^4u_xx</td><td style="text-align: right;">-0.0479</td><td style="text-align: right;">  0.000835</td></tr>
+<tr><td>Nagumo | Drift        </td><td>1      </td><td style="text-align: right;">-0.0135</td><td style="text-align: right;">  6.3e-05 </td></tr>
+<tr><td>Nagumo | Drift        </td><td>u      </td><td style="text-align: right;"> 0.3482</td><td style="text-align: right;">  0.000963</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^2    </td><td style="text-align: right;"> 0.5906</td><td style="text-align: right;">  0.00221 </td></tr>
+<tr><td>Nagumo | Drift        </td><td>u^5    </td><td style="text-align: right;">-1.0978</td><td style="text-align: right;">  0.020105</td></tr>
+<tr><td>Nagumo | Drift        </td><td>u_xx   </td><td style="text-align: right;"> 0.9774</td><td style="text-align: right;">  0.000375</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u      </td><td style="text-align: right;"> 1.017 </td><td style="text-align: right;">  0.001677</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u^3    </td><td style="text-align: right;">-1.0516</td><td style="text-align: right;">  0.008017</td></tr>
+<tr><td>Allen_Cahn | Drift    </td><td>u_xx   </td><td style="text-align: right;"> 0.9976</td><td style="text-align: right;">  0.000302</td></tr>
+<tr><td>KdV | Drift           </td><td>uu_x   </td><td style="text-align: right;">-1.0257</td><td style="text-align: right;">  0.00079 </td></tr>
+<tr><td>KdV | Drift           </td><td>u_xx   </td><td style="text-align: right;">-0.0536</td><td style="text-align: right;">  0.000119</td></tr>
+<tr><td>KdV | Drift           </td><td>u_xxx  </td><td style="text-align: right;">-0.9957</td><td style="text-align: right;">  1e-05   </td></tr>
+<tr><td>KdV | Drift           </td><td>u_xxxx </td><td style="text-align: right;">-0.0253</td><td style="text-align: right;">  4e-06   </td></tr>
+<tr><td>Heat | Diffusion      </td><td>1      </td><td style="text-align: right;"> 0.9685</td><td style="text-align: right;">  1e-06   </td></tr>
+<tr><td>Nagumo | Diffusion    </td><td>1      </td><td style="text-align: right;"> 0.9687</td><td style="text-align: right;">  2e-06   </td></tr>
+<tr><td>Allen_Cahn | Diffusion</td><td>1      </td><td style="text-align: right;"> 0.9703</td><td style="text-align: right;">  2e-06   </td></tr>
+<tr><td>KdV | Diffusion       </td><td>1      </td><td style="text-align: right;"> 0.9981</td><td style="text-align: right;">  5e-06   </td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^2    </td><td style="text-align: right;">-0.3183</td><td style="text-align: right;">  0.000139</td></tr>
+<tr><td>KdV | Diffusion       </td><td>u_x    </td><td style="text-align: right;">-0.0551</td><td style="text-align: right;">  6.8e-05 </td></tr>
+<tr><td>KdV | Diffusion       </td><td>u^2u_x </td><td style="text-align: right;">-0.0663</td><td style="text-align: right;">  0.000121</td></tr>
+<tr><td>KdV | Diffusion       </td><td>uu_xx  </td><td style="text-align: right;">-0.4729</td><td style="text-align: right;">  0.00011 </td></tr>
+</tbody>
+</table>

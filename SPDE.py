@@ -463,6 +463,77 @@ def print_pde(w, rhs_description, ut="u_t"):
     print(pde)
 
 
+def ormerodAlgorithm2(
+    X, y, tol, verbosity, p0, vs, A=1e-4, B=1e-4, tau0=1000, M=100, P=50
+):
+    P = X.shape[1]  # better than 50 ofc
+    z0 = np.zeros(P)
+    currentELBO = -np.inf
+    for i in range(P):
+        elbos = np.zeros(P)
+        for j in range(P):
+            currentZ0 = z0.copy()
+            currentZ0[j] = 1
+            elbos[j] = Variational_Bayes_Code(
+                X, y, currentZ0, tol, verbosity, p0, vs, A, B, tau0
+            )["ELBO"]
+        bestIndex = np.argmax(elbos)
+        z0[bestIndex] = 1
+        print(
+            f"[Phase 1] Step {i+1}/{P}: added term {bestIndex}, ELBO = {np.max(elbos):.4f} (prev = {currentELBO:.4f})"
+        )
+        if np.abs(np.max(elbos) - currentELBO) < tol:
+            print(f"[Phase 1] Converged at step {i+1}, no further improvement.")
+            break
+        currentELBO = np.max(elbos)
+    print(
+        f"[Phase 1] Complete. Active terms: {np.where(z0 == 1)[0].tolist()}, ELBO = {currentELBO:.4f}\n"
+    )
+
+    for i in range(M):
+        rhoValues = expit(np.linspace(-10, 10, 50))  # below -10 is pointless
+        elbos = np.zeros(len(rhoValues))
+        for j in range(len(rhoValues)):
+            elbos[j] = Variational_Bayes_Code(
+                X, y, z0, tol, verbosity, rhoValues[j], vs, A, B, tau0
+            )["ELBO"]
+        bestRho = rhoValues[np.argmax(elbos)]
+        print(
+            f"[Phase 2] Iteration {i+1}/{M}: best rho = {bestRho:.4f}, ELBO = {np.max(elbos):.4f}"
+        )
+
+        for j in range(P):
+            currentZ0 = z0.copy()
+            currentZ0[j] = 0
+            elbo0 = Variational_Bayes_Code(
+                X, y, currentZ0, tol, verbosity, bestRho, vs, A, B, tau0
+            )["ELBO"]
+            currentZ0[j] = 1
+            elbo1 = Variational_Bayes_Code(
+                X, y, currentZ0, tol, verbosity, bestRho, vs, A, B, tau0
+            )["ELBO"]
+            z0[j] = 0 if elbo0 > elbo1 else 1
+        print(
+            f"[Phase 2] Iteration {i+1}/{M}: after term selection, active terms = {np.where(z0 == 1)[0].tolist()}"
+        )
+
+        newELBO = Variational_Bayes_Code(
+            X, y, z0, tol, verbosity, bestRho, vs, A, B, tau0
+        )["ELBO"]
+        print(
+            f"[Phase 2] Iteration {i+1}/{M}: ELBO after term selection = {newELBO:.4f} (prev = {currentELBO:.4f})"
+        )
+        if np.abs(newELBO - currentELBO) < tol:
+            print(f"[Phase 2] Converged at iteration {i+1}.")
+            break
+        currentELBO = newELBO
+    print(
+        f"[Phase 2] Complete. Final active terms: {np.where(z0 == 1)[0].tolist()}, ELBO = {currentELBO:.4f}"
+    )
+
+    return Variational_Bayes_Code(X, y, z0, tol, verbosity, bestRho, vs, A, B, tau0)
+
+
 def Variational_Bayes_Code(
     X, y, initz0, tol, verbosity, p0, vs, A=1e-4, B=1e-4, tau0=1000
 ):
@@ -472,17 +543,11 @@ def Variational_Bayes_Code(
     if len(X) != len(y):
         raise Exception("Number of observations do not match")
 
-    N = len(X)
     # Prior parameters of noise variance (Inverse Gamma dist)
-    # A = 1e-4
-    # B = 1e-4
-    # vs = 100
-    # tau0 = 1000
 
     if len(initz0) == 0:
         raise Exception("No initial value of z found")
     else:
-        p0 = p0  # using exponent results in really small incl prob - could have been another mistake with the exp (really small for large datasets)
         initz = initz0
         DS, LLcvg = run_VB2(X, y, vs, A, B, tau0, p0, initz, tol, verbosity)
 
@@ -501,6 +566,7 @@ def Variational_Bayes_Code(
     out_vb["Wsel"] = DS["wmean"][modelIdx]
     out_vb["Wcov"] = DS["wCOV"][modelIdx, modelIdx]
     out_vb["sig2"] = DS["sig2"]
+    out_vb["ELBO"] = LLcvg
 
     return out_vb
 
@@ -623,7 +689,7 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
 
             if cvg < 0 and verbosity:
                 print("OOPS!  log(like) decreasing!!")
-            elif cvg < tol or iter_ > max_iter:
+            elif np.abs(cvg) < tol or iter_ > max_iter:
                 converged = 1
                 LL = LL[0:iter_]
 
