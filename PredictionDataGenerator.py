@@ -92,7 +92,14 @@ function kdv_drift_jl(du, u, p, t)
 end
 
 function oned_noise_jl(du, u, p, t)
-    sigma = p[3]
+    sigma = p[3]  # (epsilon, dx, sigma, ...)
+    for i in 1:{N}
+        du[i] = sigma
+    end
+end
+
+function kdv_noise_jl(du, u, p, t)
+    sigma = p[2]  # KdV: (dx, sigma, uu_x_coeff, u_xxx_coeff)
     for i in 1:{N}
         du[i] = sigma
     end
@@ -259,6 +266,17 @@ def generatePrediction(method=None):
         "nagumo": jl.nagumo_drift_jl,
         "kdv": jl.kdv_drift_jl,
     }
+    noiseEquations = {
+        "heat": jl.oned_noise_jl,
+        "allen_cahn": jl.oned_noise_jl,
+        "nagumo": jl.oned_noise_jl,
+        "kdv": jl.kdv_noise_jl,
+    }
+    # NOTE: in the data used for the reported experiments, oned_noise_jl read p[3] for all
+    # equations. For KdV (p = (dx, sigma, uu_x_coeff, u_xxx_coeff)) this returned
+    # uu_x_coeff = -1 rather than sigma = 1. Since |uu_x_coeff| = 1 = sigma, the noise
+    # amplitude was correct by coincidence; only the sign differed, which is virtually inconsequential
+    # for additive Gaussian noise.
 
     pTrue = getParameters(method)
     predParams = samplePredParameters(method, TOTAL_SAMPLES)
@@ -273,7 +291,7 @@ def generatePrediction(method=None):
     ]:
         baseProblem = de.SDEProblem(
             driftEquations[method],
-            jl.oned_noise_jl,
+            noiseEquations[method],
             initialConditions[0],  # overridden by prob_func
             timeSpan,
             pTrue,
@@ -281,9 +299,10 @@ def generatePrediction(method=None):
         ensembleProblem = de.EnsembleProblem(baseProblem, prob_func=probFunc)
         solution = de.solve(
             ensembleProblem,
-            de.EM(),
+            de.SRIW1(),
             de.EnsembleSerial(),  # serial for reproducibility with seeded noise
             trajectories=TOTAL_SAMPLES,
+            adaptive=False,
             saveat=dt,
             dt=dt,
         )

@@ -15,17 +15,23 @@
 <tr><td>Allen_Cahn | Drift    </td><td>u      </td><td style="text-align: right;"> 1.017 </td><td style="text-align: right;">  0.001677</td></tr>
 <tr><td>Allen_Cahn | Drift    </td><td>u^3    </td><td style="text-align: right;">-1.0516</td><td style="text-align: right;">  0.008017</td></tr>
 <tr><td>Allen_Cahn | Drift    </td><td>u_xx   </td><td style="text-align: right;"> 0.9976</td><td style="text-align: right;">  0.000302</td></tr>
-<tr><td>KdV | Drift           </td><td>uu_x   </td><td style="text-align: right;">-1.0257</td><td style="text-align: right;">  0.00079 </td></tr>
-<tr><td>KdV | Drift           </td><td>u_xx   </td><td style="text-align: right;">-0.0536</td><td style="text-align: right;">  0.000119</td></tr>
-<tr><td>KdV | Drift           </td><td>u_xxx  </td><td style="text-align: right;">-0.9957</td><td style="text-align: right;">  1e-05   </td></tr>
-<tr><td>KdV | Drift           </td><td>u_xxxx </td><td style="text-align: right;">-0.0253</td><td style="text-align: right;">  4e-06   </td></tr>
+<tr><td>KdV | Drift    </td><td>uu_x    </td><td style="text-align: right;">-0.9796</td><td style="text-align: right;">  0.000793</td></tr>
+<tr><td>KdV | Drift    </td><td>u_xx    </td><td style="text-align: right;">-0.0599</td><td style="text-align: right;">  0.000125</td></tr>
+<tr><td>KdV | Drift    </td><td>u_xxx   </td><td style="text-align: right;">-1.001 </td><td style="text-align: right;">  1e-05   </td></tr>
+<tr><td>KdV | Drift    </td><td>u_xxxx  </td><td style="text-align: right;">-0.0267</td><td style="text-align: right;">  4e-06   </td></tr>
 <tr><td>Heat | Diffusion      </td><td>1      </td><td style="text-align: right;"> 0.9685</td><td style="text-align: right;">  1e-06   </td></tr>
 <tr><td>Nagumo | Diffusion    </td><td>1      </td><td style="text-align: right;"> 0.9687</td><td style="text-align: right;">  2e-06   </td></tr>
 <tr><td>Allen_Cahn | Diffusion</td><td>1      </td><td style="text-align: right;"> 0.9703</td><td style="text-align: right;">  2e-06   </td></tr>
-<tr><td>KdV | Diffusion       </td><td>1      </td><td style="text-align: right;"> 0.9981</td><td style="text-align: right;">  5e-06   </td></tr>
-<tr><td>KdV | Diffusion       </td><td>u^2    </td><td style="text-align: right;">-0.3183</td><td style="text-align: right;">  0.000139</td></tr>
-<tr><td>KdV | Diffusion       </td><td>u_x    </td><td style="text-align: right;">-0.0551</td><td style="text-align: right;">  6.8e-05 </td></tr>
-<tr><td>KdV | Diffusion       </td><td>u^2u_x </td><td style="text-align: right;">-0.0663</td><td style="text-align: right;">  0.000121</td></tr>
-<tr><td>KdV | Diffusion       </td><td>uu_xx  </td><td style="text-align: right;">-0.4729</td><td style="text-align: right;">  0.00011 </td></tr>
+<tr><td>KdV | Diffusion</td><td>1       </td><td style="text-align: right;"> 0.9967</td><td style="text-align: right;">  5e-06   </td></tr>
+<tr><td>KdV | Diffusion</td><td>u       </td><td style="text-align: right;">-0.0988</td><td style="text-align: right;">  0.000229</td></tr>
+<tr><td>KdV | Diffusion</td><td>u^2     </td><td style="text-align: right;">-0.164 </td><td style="text-align: right;">  0.000271</td></tr>
+<tr><td>KdV | Diffusion</td><td>u^3     </td><td style="text-align: right;"> 0.3726</td><td style="text-align: right;">  0.000891</td></tr>
+<tr><td>KdV | Diffusion</td><td>u^5     </td><td style="text-align: right;">-0.0503</td><td style="text-align: right;">  3e-05   </td></tr>
+<tr><td>KdV | Diffusion</td><td>uu_x    </td><td style="text-align: right;">-0.1414</td><td style="text-align: right;">  0.000153</td></tr>
+<tr><td>KdV | Diffusion</td><td>u^2u_x  </td><td style="text-align: right;">-0.3065</td><td style="text-align: right;">  0.000278</td></tr>
+<tr><td>KdV | Diffusion</td><td>u^4u_x  </td><td style="text-align: right;"> 0.036 </td><td style="text-align: right;">  3e-05   </td></tr>
+<tr><td>KdV | Diffusion</td><td>uu_xx   </td><td style="text-align: right;">-0.408 </td><td style="text-align: right;">  0.000111</td></tr>
+<tr><td>KdV | Diffusion</td><td>u^2u_xxx</td><td style="text-align: right;">-0.0137</td><td style="text-align: right;">  1e-06   </td></tr>
 </tbody>
 </table>
+

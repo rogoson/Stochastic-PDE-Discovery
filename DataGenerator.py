@@ -101,9 +101,16 @@ end
 
         
 function oned_noise_jl(du, u, p, t)
-    sigma = p[3]
+    sigma = p[3]  # (epsilon, dx, sigma, ...)
     for i in 1:{N}
-        du[i] = sigma 
+        du[i] = sigma
+    end
+end
+
+function kdv_noise_jl(du, u, p, t)
+    sigma = p[2]  # KdV: (dx, sigma, uu_x_coeff, u_xxx_coeff)
+    for i in 1:{N}
+        du[i] = sigma
     end
 end
 """)
@@ -150,9 +157,15 @@ def generateData(method=None, randomConditions=False):
         "nagumo": jl.nagumo_drift_jl,
         "kdv": jl.kdv_drift_jl,
     }
+    noiseEquations = {
+        "heat": jl.oned_noise_jl,
+        "allen_cahn": jl.oned_noise_jl,
+        "nagumo": jl.oned_noise_jl,
+        "kdv": jl.kdv_noise_jl,
+    }
     baseProblem = de.SDEProblem(
         driftEquations[method],
-        jl.oned_noise_jl,
+        noiseEquations[method],
         (
             initialConditions.get(method, [0.0] * N)
             if not randomConditions
