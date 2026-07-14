@@ -70,4 +70,7 @@ file ensuring that the periodic sinusoidal boundary conditions are enforced
 
 **8. Stochastic SINDy Threshold may be inconsistent**
 At least in the notebook - heat is the only one that has an actual value of 0.2 for the sparsity threshold I believe.
+
+**9. p_0 might be off between paper and code**
+Paper says 0.1, code uses Ormerod's expit.
 ****
