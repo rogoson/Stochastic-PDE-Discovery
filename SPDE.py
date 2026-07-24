@@ -662,9 +662,6 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
         # Calculate marginal log-likelihood
         # clip zm away from 0 and 1 to avoid log(0) and 0*log(0) = nan
         zm_clipped = np.clip(zm, 1e-10, 1 - 1e-10)
-        traceTerm = (
-            -0.5 * invVs * (np.dot(mu, mu) + np.trace(Sigma))
-        )  # missing  but not really used for update
         # use slogdet instead of log(det()) to avoid underflow for large p
         sign, logdet = np.linalg.slogdet(Sigma)
         LL[iter_] = (
@@ -676,7 +673,6 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
             + loggamma(Abar)
             - Abar * np.log(s)
             + 0.5 * logdet
-            + traceTerm
             + np.nansum(zm_clipped * (np.log(p0) - np.log(zm_clipped)))
             + np.nansum((1 - zm_clipped) * (np.log(1 - p0) - np.log(1 - zm_clipped)))
         )
