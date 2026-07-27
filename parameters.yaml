@@ -154,3 +154,12 @@ nagumo:
       u_coeff_variance: 0.00014156
       u3_coeff: 0.031985
       u3_coeff_variance: 0.00765001
+burgers:
+  initial_condition: sin(x)
+  correct:
+    drift:
+      epsilon: 0.5
+      uu_x_coeff: 3
+    diffusion:
+      sigma: 1
+      u_coeff: 1

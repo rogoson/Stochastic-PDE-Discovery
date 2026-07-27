@@ -74,6 +74,18 @@ function nagumo_drift_jl(du, u, p, t)
     du[{N}] = epsilon * (u[{N-1}] - 2u[{N}] + u[1]) / dx2 + u_coeff * u[{N}] + u2_coeff * u[{N}]^2 + u3_coeff * u[{N}]^3
 end
 
+
+function burgers_drift_jl(du, u, p, t)
+    epsilon, dx, sigma, uu_x_coeff = p
+    dx2 = dx^2
+    du[1] = uu_x_coeff * u[1] * (u[2] - u[{N}]) / (2*dx) + epsilon * (u[{N}] - 2u[1] + u[2]) / dx2
+    for i in 2:{N-1}
+        du[i] = uu_x_coeff * u[i] * (u[i+1] - u[i-1]) / (2*dx) + epsilon * (u[i-1] - 2u[i] + u[i+1]) / dx2
+    end
+    du[{N}] = uu_x_coeff * u[{N}] * (u[1] - u[{N-1}]) / (2*dx) + epsilon * (u[{N-1}] - 2u[{N}] + u[1]) / dx2
+end
+
+
 function kdv_drift_jl(du, u, p, t)
     dx, sigma, uu_x_coeff, u_xxx_coeff = p
     dx3 = dx^3
@@ -105,6 +117,14 @@ function kdv_noise_jl(du, u, p, t)
     end
 end
 
+function burgers_noise_jl(du, u, p, t)
+    sigma = p[3]  # Burgers: (epsilon, dx, sigma, uu_x_coeff, u_coeff)
+    u_coeff = p[5]  # Burgers: (epsilon, dx, sigma, uu_x_coeff, u_coeff)
+    for i in 1:{N}
+        du[i] = sigma + u_coeff * u[i]
+    end
+end
+    
 function prob_func_True(prob, context)
     i = context.sim_id
     u0_i = collect(Float64, Main.initialConditions[i])
@@ -135,6 +155,10 @@ def getParameters(method):
         p = (epsilon, dx, sigma, u_coeff, u2_coeff, u3_coeff)
     elif method == "heat":
         p = (epsilon, dx, sigma)
+    elif method == "burgers":
+        uu_x_coeff = yamlParameters[method]["correct"]["drift"]["uu_x_coeff"]
+        u_coeff = yamlParameters[method]["correct"]["diffusion"]["u_coeff"]
+        p = (epsilon, dx, sigma, uu_x_coeff, u_coeff)
     elif method == "kdv":
         uu_x_coeff = yamlParameters[method]["correct"]["drift"]["uu_x_coeff"]
         u_xxx_coeff = yamlParameters[method]["correct"]["drift"]["u_xxx_coeff"]

@@ -37,6 +37,7 @@ initialConditionsRandom = {
     "heat": random_smooth_ic(len(x), 1).flatten(),
     "allen_cahn": random_smooth_ic(len(x), 1).flatten(),
     "nagumo": random_smooth_ic(len(x), 1).flatten(),
+    "burgers": random_smooth_ic(len(x), 1).flatten(),
     "kdv": random_smooth_ic(len(x), 1).flatten(),
 }
 
@@ -47,10 +48,13 @@ initialConditions = {
     "allen_cahn": list(np.sin(2 * np.pi * x / L)),
     "nagumo": list(np.cos(2 * np.pi * x / L)),  # cos(0)=1, cos(2pi)=1
     "kdv": list(np.sin(2 * np.pi * x / L)),
+    "burgers": list(np.sin(2 * np.pi * x / L)),
 }
 
 # normal heat update, but copying boundary conditions from matlab code (2x thing next to start/end)
+
 jl.seval(f"""
+using SciMLBase, Random
 
 function heat_drift_jl(du, u, p, t)
     epsilon, dx, sigma = p
@@ -82,6 +86,18 @@ function nagumo_drift_jl(du, u, p, t)
     du[{N}] = epsilon * (u[{N-1}] - 2u[{N}] + u[1]) / dx2 + u_coeff * u[{N}] + u2_coeff * u[{N}]^2 + u3_coeff * u[{N}]^3
 end
 
+
+function burgers_drift_jl(du, u, p, t)
+    epsilon, dx, sigma, uu_x_coeff = p
+    dx2 = dx^2
+    du[1] = uu_x_coeff * u[1] * (u[2] - u[{N}]) / (2*dx) + epsilon * (u[{N}] - 2u[1] + u[2]) / dx2
+    for i in 2:{N-1}
+        du[i] = uu_x_coeff * u[i] * (u[i+1] - u[i-1]) / (2*dx) + epsilon * (u[i-1] - 2u[i] + u[i+1]) / dx2
+    end
+    du[{N}] = uu_x_coeff * u[{N}] * (u[1] - u[{N-1}]) / (2*dx) + epsilon * (u[{N-1}] - 2u[{N}] + u[1]) / dx2
+end
+
+
 function kdv_drift_jl(du, u, p, t)
     dx, sigma, uu_x_coeff, u_xxx_coeff = p
     dx3 = dx^3
@@ -99,7 +115,6 @@ function kdv_drift_jl(du, u, p, t)
               uu_x_coeff * u[{N}] * (u[1] - u[{N-1}]) / (2*dx)
 end
 
-        
 function oned_noise_jl(du, u, p, t)
     sigma = p[3]  # (epsilon, dx, sigma, ...)
     for i in 1:{N}
@@ -113,9 +128,28 @@ function kdv_noise_jl(du, u, p, t)
         du[i] = sigma
     end
 end
-""")
 
-# continuous (not scaling the noise by /sqrt(dx) to spread noise out - which would end with a higher estimate overall actually)
+function burgers_noise_jl(du, u, p, t)
+    sigma = p[3]  # Burgers: (epsilon, dx, sigma, uu_x_coeff, u_coeff)
+    u_coeff = p[5]  # Burgers: (epsilon, dx, sigma, uu_x_coeff, u_coeff)
+    for i in 1:{N}
+        du[i] = sigma + u_coeff * u[i]
+    end
+end
+    
+function prob_func_True(prob, context)
+    i = context.sim_id
+    u0_i = collect(Float64, Main.initialConditions[i])
+    remake(prob, u0=u0_i, seed=i)
+end
+
+function prob_func_pred(prob, context)
+    i = context.sim_id
+    u0_i = collect(Float64, Main.initialConditions[i])
+    p_i = Tuple(Main.predParams[i])
+    remake(prob, u0=u0_i, p=p_i, seed=i)  # same seed i as True
+end
+""")
 
 
 def getParameters(method):
@@ -133,6 +167,10 @@ def getParameters(method):
         p = (epsilon, dx, sigma, u_coeff, u2_coeff, u3_coeff)
     elif method == "heat":
         p = (epsilon, dx, sigma)
+    elif method == "burgers":
+        uu_x_coeff = yamlParameters[method]["correct"]["drift"]["uu_x_coeff"]
+        u_coeff = yamlParameters[method]["correct"]["diffusion"]["u_coeff"]
+        p = (epsilon, dx, sigma, uu_x_coeff, u_coeff)
     elif method == "kdv":
         uu_x_coeff = yamlParameters[method]["correct"]["drift"]["uu_x_coeff"]
         u_xxx_coeff = yamlParameters[method]["correct"]["drift"]["u_xxx_coeff"]
@@ -156,11 +194,13 @@ def generateData(method=None, randomConditions=False):
         "allen_cahn": jl.allen_cahn_drift_jl,
         "nagumo": jl.nagumo_drift_jl,
         "kdv": jl.kdv_drift_jl,
+        "burgers": jl.burgers_drift_jl,
     }
     noiseEquations = {
         "heat": jl.oned_noise_jl,
         "allen_cahn": jl.oned_noise_jl,
         "nagumo": jl.oned_noise_jl,
+        "burgers": jl.burgers_noise_jl,
         "kdv": jl.kdv_noise_jl,
     }
     baseProblem = de.SDEProblem(
