@@ -73,4 +73,14 @@ At least in the notebook - heat is the only one that has an actual value of 0.2 
 
 **9. p_0 might be off between paper and code**
 Paper says 0.1, code uses Ormerod's expit.
+
+**10. Threshold for VB isn't really right**
+Concerns about
+```python
+ for i in range(dictionary.shape[1]):
+    if abs(DS['wmean'][i]) <= 0.01:
+        DS['zmean'][i] = 0
+        DS['wmean'][i] = 0
+```
+Doesn't really make sense to do this - just because a posterior mean is vanishingly small and (fairly insignificant) doesn't mean you should then zero its posterior probability. Zeroing the mean can be argued for but the probability I think is  a bit of a stretch.
 ****
