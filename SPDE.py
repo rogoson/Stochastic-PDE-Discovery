@@ -15,6 +15,7 @@ import numpy as np
 import warnings
 from numpy import linalg as la
 from scipy.special import loggamma
+from joblib import Parallel, delayed
 
 
 def sindy(lam, D, dxdt, iteration=10):
@@ -100,220 +101,91 @@ def FiniteDiff(u, dx, d, periodic=False):
     """
 
     n = u.size
+
+    if periodic:
+        if d == 1:
+            return (np.roll(u, -1) - np.roll(u, 1)) / (2 * dx)
+        if d == 2:
+            return (np.roll(u, -1) - 2 * u + np.roll(u, 1)) / dx**2
+        if d == 3:
+            return (
+                0.5 * np.roll(u, -2)
+                - np.roll(u, -1)
+                + np.roll(u, 1)
+                - 0.5 * np.roll(u, 2)
+            ) / dx**3
+        if d == 4:
+            return (
+                np.roll(u, -2)
+                - 4 * np.roll(u, -1)
+                + 6 * u
+                - 4 * np.roll(u, 1)
+                + np.roll(u, 2)
+            ) / dx**4
+        if d == 5:
+            return (
+                0.5 * np.roll(u, -3)
+                - 2 * np.roll(u, -2)
+                + 2.5 * np.roll(u, -1)
+                - 2.5 * np.roll(u, 1)
+                + 2 * np.roll(u, 2)
+                - 0.5 * np.roll(u, 3)
+            ) / dx**5
+        if d == 6:
+            return (
+                np.roll(u, -3)
+                - 6 * np.roll(u, -2)
+                + 15 * np.roll(u, -1)
+                - 20 * u
+                + 15 * np.roll(u, 1)
+                - 6 * np.roll(u, 2)
+                + np.roll(u, 3)
+            ) / dx**6
+        if d > 6:
+            return FiniteDiff(FiniteDiff(u, dx, 6, True), dx, d - 6, True)
+
     ux = np.zeros(n, dtype=np.float64)
 
     if d == 1:
         for i in range(1, n - 1):
             ux[i] = (u[i + 1] - u[i - 1]) / (2 * dx)
-
-        if periodic:
-            ux[0] = (u[1] - u[n - 1]) / (2 * dx)
-            ux[n - 1] = (u[0] - u[n - 2]) / (2 * dx)
-        else:
-            ux[0] = (-3.0 / 2 * u[0] + 2 * u[1] - u[2] / 2) / dx
-            ux[n - 1] = (3.0 / 2 * u[n - 1] - 2 * u[n - 2] + u[n - 3] / 2) / dx
+        ux[0] = (-3.0 / 2 * u[0] + 2 * u[1] - u[2] / 2) / dx
+        ux[n - 1] = (3.0 / 2 * u[n - 1] - 2 * u[n - 2] + u[n - 3] / 2) / dx
         return ux
 
     if d == 2:
         for i in range(1, n - 1):
             ux[i] = (u[i + 1] - 2 * u[i] + u[i - 1]) / dx**2
-
-        if periodic:
-            ux[0] = (u[1] - 2 * u[0] + u[n - 1]) / dx**2
-            ux[n - 1] = (u[0] - 2 * u[n - 1] + u[n - 2]) / dx**2
-        else:
-            ux[0] = (2 * u[0] - 5 * u[1] + 4 * u[2] - u[3]) / dx**2
-            ux[n - 1] = (2 * u[n - 1] - 5 * u[n - 2] + 4 * u[n - 3] - u[n - 4]) / dx**2
+        ux[0] = (2 * u[0] - 5 * u[1] + 4 * u[2] - u[3]) / dx**2
+        ux[n - 1] = (2 * u[n - 1] - 5 * u[n - 2] + 4 * u[n - 3] - u[n - 4]) / dx**2
         return ux
 
     if d == 3:
         for i in range(2, n - 2):
             ux[i] = (u[i + 2] / 2 - u[i + 1] + u[i - 1] - u[i - 2] / 2) / dx**3
-
-        if periodic:
-            ux[0] = (u[2] / 2 - u[1] + u[n - 1] - u[n - 2] / 2) / dx**3
-            ux[1] = (u[3] / 2 - u[2] + u[0] - u[n - 1] / 2) / dx**3
-            ux[n - 1] = (u[1] / 2 - u[0] + u[n - 2] - u[n - 3] / 2) / dx**3
-            ux[n - 2] = (u[0] / 2 - u[n - 1] + u[n - 3] - u[n - 4] / 2) / dx**3
-        else:
-            ux[0] = (-2.5 * u[0] + 9 * u[1] - 12 * u[2] + 7 * u[3] - 1.5 * u[4]) / dx**3
-            ux[1] = (-2.5 * u[1] + 9 * u[2] - 12 * u[3] + 7 * u[4] - 1.5 * u[5]) / dx**3
-            ux[n - 1] = (
-                2.5 * u[n - 1]
-                - 9 * u[n - 2]
-                + 12 * u[n - 3]
-                - 7 * u[n - 4]
-                + 1.5 * u[n - 5]
-            ) / dx**3
-            ux[n - 2] = (
-                2.5 * u[n - 2]
-                - 9 * u[n - 3]
-                + 12 * u[n - 4]
-                - 7 * u[n - 5]
-                + 1.5 * u[n - 6]
-            ) / dx**3
+        ux[0] = (-2.5 * u[0] + 9 * u[1] - 12 * u[2] + 7 * u[3] - 1.5 * u[4]) / dx**3
+        ux[1] = (-2.5 * u[1] + 9 * u[2] - 12 * u[3] + 7 * u[4] - 1.5 * u[5]) / dx**3
+        ux[n - 1] = (
+            2.5 * u[n - 1]
+            - 9 * u[n - 2]
+            + 12 * u[n - 3]
+            - 7 * u[n - 4]
+            + 1.5 * u[n - 5]
+        ) / dx**3
+        ux[n - 2] = (
+            2.5 * u[n - 2]
+            - 9 * u[n - 3]
+            + 12 * u[n - 4]
+            - 7 * u[n - 5]
+            + 1.5 * u[n - 6]
+        ) / dx**3
         return ux
 
-    if d == 4:
-        for i in range(2, n - 2):
-            ux[i] = (
-                u[i + 2] - 4 * u[i + 1] + 6 * u[i] - 4 * u[i - 1] + u[i - 2]
-            ) / dx**4
+    if d >= 4:
+        raise ValueError(
+            f"{d}th derivative not implemented for non-periodic boundary conditions. Stencil not found."
+        )
 
-        if periodic:
-            ux[0] = (u[2] - 4 * u[1] + 6 * u[0] - 4 * u[n - 1] + u[n - 2]) / dx**4
-            ux[1] = (u[3] - 4 * u[2] + 6 * u[1] - 4 * u[0] + u[n - 1]) / dx**4
-            ux[n - 1] = (
-                u[1] - 4 * u[0] + 6 * u[n - 1] - 4 * u[n - 2] + u[n - 3]
-            ) / dx**4
-            ux[n - 2] = (
-                u[0] - 4 * u[n - 1] + 6 * u[n - 2] - 4 * u[n - 3] + u[n - 4]
-            ) / dx**4
-        else:
-            raise ValueError(
-                "4th derivative not implemented for non-periodic boundary conditions. Stencil not found."
-            )
-
-    if d == 5:
-        for i in range(3, n - 3):
-            ux[i] = (
-                0.5 * u[i + 3]
-                - 2 * u[i + 2]
-                + 2.5 * u[i + 1]
-                - 2.5 * u[i - 1]
-                + 2 * u[i - 2]
-                - 0.5 * u[i - 3]
-            ) / dx**5
-
-        if periodic:
-            ux[0] = (
-                0.5 * u[3]
-                - 2 * u[2]
-                + 2.5 * u[1]
-                - 2.5 * u[n - 1]
-                + 2 * u[n - 2]
-                - 0.5 * u[n - 3]
-            ) / dx**5
-            ux[1] = (
-                0.5 * u[4]
-                - 2 * u[3]
-                + 2.5 * u[2]
-                - 2.5 * u[0]
-                + 2 * u[n - 1]
-                - 0.5 * u[n - 2]
-            ) / dx**5
-            ux[2] = (
-                0.5 * u[5]
-                - 2 * u[4]
-                + 2.5 * u[3]
-                - 2.5 * u[1]
-                + 2 * u[0]
-                - 0.5 * u[n - 1]
-            ) / dx**5
-            ux[n - 1] = (
-                0.5 * u[2]
-                - 2 * u[1]
-                + 2.5 * u[0]
-                - 2.5 * u[n - 2]
-                + 2 * u[n - 3]
-                - 0.5 * u[n - 4]
-            ) / dx**5
-            ux[n - 2] = (
-                0.5 * u[1]
-                - 2 * u[0]
-                + 2.5 * u[n - 1]
-                - 2.5 * u[n - 3]
-                + 2 * u[n - 4]
-                - 0.5 * u[n - 5]
-            ) / dx**5
-            ux[n - 3] = (
-                0.5 * u[0]
-                - 2 * u[n - 1]
-                + 2.5 * u[n - 2]
-                - 2.5 * u[n - 4]
-                + 2 * u[n - 5]
-                - 0.5 * u[n - 6]
-            ) / dx**5
-        else:
-            raise ValueError(
-                "5th derivative not implemented for non-periodic boundary conditions. Stencil not found."
-            )
-
-    if d == 6:
-
-        for i in range(3, n - 3):
-            ux[i] = (
-                1 * u[i + 3]
-                - 6 * u[i + 2]
-                + 15 * u[i + 1]
-                - 20 * u[i]
-                + 15 * u[i - 1]
-                - 6 * u[i - 2]
-                + 1 * u[i - 3]
-            ) / dx**6
-
-        if periodic:
-            ux[0] = (
-                1 * u[3]
-                - 6 * u[2]
-                + 15 * u[1]
-                - 20 * u[0]
-                + 15 * u[n - 1]
-                - 6 * u[n - 2]
-                + 1 * u[n - 3]
-            ) / dx**6
-            ux[1] = (
-                1 * u[4]
-                - 6 * u[3]
-                + 15 * u[2]
-                - 20 * u[1]
-                + 15 * u[0]
-                - 6 * u[n - 1]
-                + 1 * u[n - 2]
-            ) / dx**6
-            ux[2] = (
-                1 * u[5]
-                - 6 * u[4]
-                + 15 * u[3]
-                - 20 * u[2]
-                + 15 * u[1]
-                - 6 * u[0]
-                + 1 * u[n - 1]
-            ) / dx**6
-            ux[n - 1] = (
-                1 * u[2]
-                - 6 * u[1]
-                + 15 * u[0]
-                - 20 * u[n - 1]
-                + 15 * u[n - 2]
-                - 6 * u[n - 3]
-                + 1 * u[n - 4]
-            ) / dx**6
-            ux[n - 2] = (
-                1 * u[1]
-                - 6 * u[0]
-                + 15 * u[n - 1]
-                - 20 * u[n - 2]
-                + 15 * u[n - 3]
-                - 6 * u[n - 4]
-                + 1 * u[n - 5]
-            ) / dx**6
-            ux[n - 3] = (
-                1 * u[0]
-                - 6 * u[n - 1]
-                + 15 * u[n - 2]
-                - 20 * u[n - 3]
-                + 15 * u[n - 4]
-                - 6 * u[n - 5]
-                + 1 * u[n - 6]
-            ) / dx**6
-        else:
-            raise ValueError(
-                "6th derivative not implemented for non-periodic boundary conditions. Stencil not found."
-            )
-
-    if d > 6:
-        return FiniteDiff(FiniteDiff(u, dx, 6, periodic), dx, d - 6, periodic)
     return ux
 
 
@@ -463,20 +335,32 @@ def print_pde(w, rhs_description, ut="u_t"):
     print(pde)
 
 
-def ormerodAlgorithm2(
-    X, y, tol, verbosity, p0, vs, A=1e-4, B=1e-4, tau0=1000, M=100, P=50
+# helpers
+def _vbElboZ(X, y, z0, tol, p0, vs, A, B, tau0):
+    """VB ELBO for a given z0 and p0."""
+    return Variational_Bayes_Code(X, y, z0, tol, False, p0, vs, A, B, tau0)["ELBO"]
+
+
+def _vbElboCoord(X, y, z0_base, j, val, tol, p0, vs, A, B, tau0):
+    """VB ELBO with z0_base[j] set to val."""
+    z = z0_base.copy()
+    z[j] = val
+    return Variational_Bayes_Code(X, y, z, tol, False, p0, vs, A, B, tau0)["ELBO"]
+
+
+def ormerodAlgorithm2(  # now parallelised
+    X, y, tol, verbosity, p0, vs, A=1e-4, B=1e-4, tau0=1000, M=100, P=50, nJobs=-1
 ):
     P = X.shape[1]  # better than 50 ofc
     z0 = np.zeros(P)
     currentELBO = -np.inf
     for i in range(P):
-        elbos = np.zeros(P)
-        for j in range(P):
-            currentZ0 = z0.copy()
-            currentZ0[j] = 1
-            elbos[j] = Variational_Bayes_Code(
-                X, y, currentZ0, tol, verbosity, p0, vs, A, B, tau0
-            )["ELBO"]
+        elbos = np.array(
+            Parallel(n_jobs=nJobs, prefer="threads")(
+                delayed(_vbElboCoord)(X, y, z0, j, 1, tol, p0, vs, A, B, tau0)
+                for j in range(P)
+            )
+        )
         bestIndex = np.argmax(elbos)
         z0[bestIndex] = 1
         print(
@@ -492,34 +376,28 @@ def ormerodAlgorithm2(
 
     for i in range(M):
         rhoValues = expit(np.linspace(-10, 10, 50))  # below -10 is pointless
-        elbos = np.zeros(len(rhoValues))
-        for j in range(len(rhoValues)):
-            elbos[j] = Variational_Bayes_Code(
-                X, y, z0, tol, verbosity, rhoValues[j], vs, A, B, tau0
-            )["ELBO"]
+        elbos = np.array(
+            Parallel(n_jobs=nJobs, prefer="threads")(
+                delayed(_vbElboZ)(X, y, z0, tol, rho, vs, A, B, tau0)
+                for rho in rhoValues
+            )
+        )
         bestRho = rhoValues[np.argmax(elbos)]
         print(
             f"[Phase 2] Iteration {i+1}/{M}: best rho = {bestRho:.4f}, ELBO = {np.max(elbos):.4f}"
         )
-
         for j in range(P):
             currentZ0 = z0.copy()
             currentZ0[j] = 0
-            elbo0 = Variational_Bayes_Code(
-                X, y, currentZ0, tol, verbosity, bestRho, vs, A, B, tau0
-            )["ELBO"]
+            elbo0 = _vbElboZ(X, y, currentZ0, tol, bestRho, vs, A, B, tau0)
             currentZ0[j] = 1
-            elbo1 = Variational_Bayes_Code(
-                X, y, currentZ0, tol, verbosity, bestRho, vs, A, B, tau0
-            )["ELBO"]
+            elbo1 = _vbElboZ(X, y, currentZ0, tol, bestRho, vs, A, B, tau0)
             z0[j] = 0 if elbo0 > elbo1 else 1
         print(
             f"[Phase 2] Iteration {i+1}/{M}: after term selection, active terms = {np.where(z0 == 1)[0].tolist()}"
         )
 
-        newELBO = Variational_Bayes_Code(
-            X, y, z0, tol, verbosity, bestRho, vs, A, B, tau0
-        )["ELBO"]
+        newELBO = _vbElboZ(X, y, z0, tol, bestRho, vs, A, B, tau0)
         print(
             f"[Phase 2] Iteration {i+1}/{M}: ELBO after term selection = {newELBO:.4f} (prev = {currentELBO:.4f})"
         )
@@ -650,9 +528,10 @@ def run_VB2(Xc, yc, vs, A, B, tau0, p0, initz, tol, verbosity):
                 * np.reshape(X[:, j], (1, -1))
                 @ (
                     np.reshape(y, (-1, 1)) * muj
-                    - X[:, remidx]
-                    @ np.diag(zstr[remidx])
-                    @ ((mu_j * muj + Sigma_jj).reshape(-1, 1))
+                    - (X[:, remidx] * zstr[remidx])
+                    @ (mu_j * muj + Sigma_jj).reshape(
+                        -1, 1
+                    )  # scaling column instead of matrix mult
                 )
             )
             zstr[j] = expit(np.clip(etaj.item(), -500, 500))

@@ -27,7 +27,7 @@ timeSpan = (yamlParameters["common"]["t_start"], endTime)
 rng = np.random.default_rng(0)
 
 
-def random_smooth_ic(n, m, sigma=3):
+def random_smooth_ic(n=64, m=1, sigma=3):
     u0 = rng.standard_normal((n, m))
     u0 = gaussian_filter(u0, sigma=sigma, mode="wrap")
     return u0
@@ -221,8 +221,8 @@ def generateData(method=None, randomConditions=False):
         de.SRIW1(),
         de.EnsembleSerial(),  # hopefully doesn't take years but for reprod.
         trajectories=TOTAL_SAMPLES,
-        adaptive=False,
         saveat=dt,
+        adaptive=False,
         dt=dt,
     )
     # shape, matching Mathpati code, but not paper - minimal difference

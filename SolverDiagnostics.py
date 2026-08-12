@@ -71,20 +71,28 @@ end
 
 
 def getParameters(method):
-    epsilon = yamlParameters[method]["correct"]["epsilon"]
-    sigma = yamlParameters[method]["correct"]["sigma"]
+    epsilon = yamlParameters[method]["correct"]["drift"]["epsilon"]
+    sigma = yamlParameters[method]["correct"]["diffusion"]["sigma"]
     dx = yamlParameters["common"]["dx"]
     if method == "allen_cahn":
-        u_coeff = yamlParameters[method]["correct"]["u_coeff"]
-        u3_coeff = yamlParameters[method]["correct"]["u3_coeff"]
+        u_coeff = yamlParameters[method]["correct"]["drift"]["u_coeff"]
+        u3_coeff = yamlParameters[method]["correct"]["drift"]["u3_coeff"]
         p = (epsilon, dx, sigma, u_coeff, u3_coeff)
     elif method == "nagumo":
-        u_coeff = yamlParameters[method]["correct"]["u_coeff"]
-        u2_coeff = yamlParameters[method]["correct"]["u2_coeff"]
-        u3_coeff = yamlParameters[method]["correct"]["u3_coeff"]
+        u_coeff = yamlParameters[method]["correct"]["drift"]["u_coeff"]
+        u2_coeff = yamlParameters[method]["correct"]["drift"]["u2_coeff"]
+        u3_coeff = yamlParameters[method]["correct"]["drift"]["u3_coeff"]
         p = (epsilon, dx, sigma, u_coeff, u2_coeff, u3_coeff)
     elif method == "heat":
         p = (epsilon, dx, sigma)
+    elif method == "burgers":
+        uu_x_coeff = yamlParameters[method]["correct"]["drift"]["uu_x_coeff"]
+        u_coeff = yamlParameters[method]["correct"]["diffusion"]["u_coeff"]
+        p = (epsilon, dx, sigma, uu_x_coeff, u_coeff)
+    elif method == "kdv":
+        uu_x_coeff = yamlParameters[method]["correct"]["drift"]["uu_x_coeff"]
+        u_xxx_coeff = yamlParameters[method]["correct"]["drift"]["u_xxx_coeff"]
+        p = (dx, sigma, uu_x_coeff, u_xxx_coeff)
     else:
         print("Unknown method: ", method)
         return
@@ -105,12 +113,17 @@ def convergence_study(method="heat", dt_multipliers=[1, 0.5, 0.25, 0.1, 0.05]):
     }
 
     base_dt = yamlParameters["common"]["dt"]
-    expected = yamlParameters[method]["correct"]["sigma"] ** 2
+    expected = yamlParameters[method]["correct"]["diffusion"]["sigma"] ** 2
 
     solvers = {
         "EM": {"solver": de.EM(), "adaptive": False},
         "SRIW1 (fixed)": {"solver": de.SRIW1(), "adaptive": False},
-        "SRIW1 (adaptive)": {"solver": de.SRIW1(), "adaptive": True},
+        "SRIW1 (tstops + adaptive)": {
+            "solver": de.SRIW1(),
+            "adaptive": True,
+            "tstops": True,
+            # "dtmax": True,
+        },  # also later try with dtmax -> dtmax still found to suck.
     }
 
     results = {name: [] for name in solvers}
@@ -134,6 +147,11 @@ def convergence_study(method="heat", dt_multipliers=[1, 0.5, 0.25, 0.1, 0.05]):
             }
             if not config["adaptive"]:
                 kwargs["adaptive"] = False
+            elif config.get("dtmax"):
+                kwargs["dtmax"] = dt_val
+            elif config.get("tstops"):
+                obs_times = np.arange(dt_val, endTime + dt_val / 2, dt_val).tolist()
+                kwargs["tstops"] = obs_times
 
             sol = de.solve(
                 ensembleProblem,
@@ -162,35 +180,6 @@ def convergence_study(method="heat", dt_multipliers=[1, 0.5, 0.25, 0.1, 0.05]):
         headers=["Solver", "dt", "KM Estimate", "Bias (%)"],
         title=f"KM Diffusion Estimate Convergence — {method} (true σ²={expected})",
     )
-
-    # plot
-    plt.rcParams["font.family"] = "serif"
-    fig, ax = plt.subplots(figsize=(8, 5))
-    for name, vals in results.items():
-        ax.plot(dt_values, vals, marker="o", linewidth=2, label=name)
-    ax.axhline(
-        y=expected,
-        color="red",
-        linestyle="--",
-        linewidth=2,
-        label=f"True σ²={expected}",
-    )
-    dataDir = os.path.join("worthwhileImages")
-    os.makedirs(dataDir, exist_ok=True)
-    ax.set_xlabel("dt", fontweight="bold")
-    ax.set_ylabel("KM diffusion estimate", fontweight="bold")
-    ax.set_title(f"Convergence of KM estimate — {method}", fontweight="bold")
-    ax.legend()
-    ax.grid(color="gray", linestyle="--", linewidth=0.5)
-    ax.invert_xaxis()  # coarse -> fine left to right
-    plt.tight_layout()
-    plt.savefig(
-        f"worthwhileImages/convergence_{method}.pdf", dpi=150, bbox_inches="tight"
-    )
-    plt.show(block=False)
-    plt.pause(5)
-    plt.close()
-
     return results
 
 

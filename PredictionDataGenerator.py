@@ -296,11 +296,6 @@ def generatePrediction(method=None):
         "nagumo": jl.oned_noise_jl,
         "kdv": jl.kdv_noise_jl,
     }
-    # NOTE: in the data used for the reported experiments, oned_noise_jl read p[3] for all
-    # equations. For KdV (p = (dx, sigma, uu_x_coeff, u_xxx_coeff)) this returned
-    # uu_x_coeff = -1 rather than sigma = 1. Since |uu_x_coeff| = 1 = sigma, the noise
-    # amplitude was correct by coincidence; only the sign differed, which is virtually inconsequential
-    # for additive Gaussian noise.
 
     pTrue = getParameters(method)
     predParams = samplePredParameters(method, TOTAL_SAMPLES)
@@ -324,10 +319,10 @@ def generatePrediction(method=None):
         solution = de.solve(
             ensembleProblem,
             de.SRIW1(),
-            de.EnsembleSerial(),  # serial for reproducibility with seeded noise
+            de.EnsembleSerial(),  # hopefully doesn't take years but for reprod.
             trajectories=TOTAL_SAMPLES,
-            adaptive=False,
             saveat=dt,
+            adaptive=False,
             dt=dt,
         )
 
