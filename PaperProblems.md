@@ -58,22 +58,29 @@ VB is initialised using the e-SINDy result rather than uninformative priors. Thi
 **5. Hardcoded discovered equation in Nagumo figure.**
 The summary figure labels the discovered equation as `0.96u_xx + 0.46u + 0.50u² - 0.99u³` as a hardcoded string, whereas the actual VB output produces `1.022u_xx + 0.524u + 0.500u² - 0.998u³`. The figure does not reflect the code's actual output.
 
-**6. Diffusion identification is consistent across all methods and examples.**
-Since all three examples use additive noise with a constant diffusion coefficient — the simplest possible case — this is not a meaningful differentiator between methods. All methods recover it reliably.
-
-
-**7. Prediction seeds.**
-The manner in which they seed the prediction data ends up making the monte carlo simulation pointless.
-
-**8. Heat Ensembles.** 
+**6. Heat Ensembles.** 
 Heat was run with **1000 ensembles** rather than the 2000 stated in the paper. This appears to be an indexing issue in the notebook. Since e-SINDy already achieves near-perfect results at 1000 ensembles, correcting to 2000 would likely make the discrepancy with the paper's reported e-SINDy performance even larger. (LLN)
 
-**9. ELBO monotonicity violation in VB.**
-The "OOPS! log(like) decreasing!!" message appears in the Nagumo VB run, and Allen Cahn seems to have some zero stability errors. Under CAVI, the ELBO should be monotonically non-decreasing by construction — a decrease indicates a numerical bug in the implementation. The algorithm recovers in these cases, but this violates a theoretical guarantee the paper implicitly relies on.
+**7. Boundary Conditions.**
+The original implementation uses zero-Neumann boundary conditions (du/dx = 0 at 
+x=0 and x=20), this is inconsistent with equation (38) which specifies periodic 
+boundary conditions where u(t, x=0) = u(t, x=20) and sin(0) != sin(20) (initial spatial condition). Zero-Neumann does 
+incidentally result in equal derivatives at both boundaries, but it doesn't mean that the field values are always equivalent. This is something fixed in the python data generation
+file ensuring that the periodic sinusoidal boundary conditions are enforced
 
+**8. Stochastic SINDy Threshold may be inconsistent**
+At least in the notebook - heat is the only one that has an actual value of 0.2 for the sparsity threshold I believe.
+
+**9. p_0 might be off between paper and code**
+Paper says 0.1, code uses Ormerod's expit.
+
+**10. Threshold for VB isn't really right**
+Concerns about
+```python
+ for i in range(dictionary.shape[1]):
+    if abs(DS['wmean'][i]) <= 0.01:
+        DS['zmean'][i] = 0
+        DS['wmean'][i] = 0
+```
+Doesn't really make sense to do this - just because a posterior mean is vanishingly small and (fairly insignificant) doesn't mean you should then zero its posterior probability. Zeroing the mean can be argued for but the probability I think is  a bit of a stretch.
 ****
-
-
-### Conclusions:
-**1.** I don't think this really changes my research direction, although I might have to include normal STLS sindy as a comparative performance method, and maybe add a two dimensional example since this seems too easy for SINDy regarding library size? I think the original authors did have a 2D nagumo example but decided not to produce it.
-**2.** I should probably email the people who produced this paper for clarity?

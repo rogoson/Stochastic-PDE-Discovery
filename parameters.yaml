@@ -1,0 +1,184 @@
+common:
+  x_start: 0
+  x_end: 20
+  t_start: 0
+  t_end: 1
+  J: 64
+  dx: 0.3125
+  timesteps: 500
+  dt: 0.002
+  N_samples: 2000
+  periodic: true
+  prediction_samples: 200
+  lasso_drift_lambda: 0.2
+  sindy_drift_lambda: 0.3
+  lasso_diffusion_lambda: 0.1
+  sindy_diffusion_lambda: 0.1
+kdv:
+  initial_condition: sin(x)
+  correct:
+    drift:
+      epsilon: 0
+      uu_x_coeff: -1
+      u_xxx_coeff: -1
+    diffusion:
+      sigma: 1
+  discovered:
+    drift:
+      u2_coeff: 0.056186
+      u2_coeff_variance: 0.01951166
+      u3_coeff: 0.132927
+      u3_coeff_variance: 0.03019003
+      uu_x_coeff: -1.03063
+      uu_x_coeff_variance: 0.00239879
+      epsilon: 0.100702
+      epsilon_variance: 4.262e-05
+      u_xxx_coeff: -0.996304
+      u_xxx_coeff_variance: 1.21e-05
+      u_coeff: 0.057844
+      u_coeff_variance: 9.726e-05
+      sigma_squared: -0.000761
+      sigma_squared_variance: 7.81e-06
+    diffusion:
+      sigma_squared: 0.97509
+      sigma_squared_variance: 9.02e-06
+      u_coeff: -0.054582
+      u_coeff_variance: 8.137e-05
+      u2_coeff: -0.074308
+      u2_coeff_variance: 0.00025031
+      u3_coeff: -0.085322
+      u3_coeff_variance: 1.318e-05
+      epsilon: -0.06279
+      epsilon_variance: 6.6e-06
+      uu_x_coeff: -0.06279
+      uu_x_coeff_variance: 6.6e-06
+      u_xxx_coeff: 0.013544
+      u_xxx_coeff_variance: 2.028e-05
+heat:
+  initial_condition: sin(x)
+  correct:
+    drift:
+      epsilon: 1
+    diffusion:
+      sigma: 1
+  discovered:
+    drift:
+      u_coeff: -0.091959
+      u_coeff_variance: 0.02284362
+      u2_coeff: 0.111173
+      u2_coeff_variance: 0.17626689
+      u3_coeff: 0.065169
+      u3_coeff_variance: 0.53436567
+      epsilon: 1.00912
+      epsilon_variance: 0.00019884
+      uu_x_coeff: 1.00912
+      uu_x_coeff_variance: 0.00019884
+      sigma_squared: -0.000761
+      sigma_squared_variance: 7.43e-06
+    diffusion:
+      sigma_squared: 0.969478
+      sigma_squared_variance: 1.27e-06
+      u2_coeff: -0.013574
+      u2_coeff_variance: 4.98e-06
+      u3_coeff: 0.005484
+      u3_coeff_variance: 2.21e-06
+      uu_x_coeff: -0.0114
+      uu_x_coeff_variance: 0.00062019
+allen_cahn:
+  initial_condition: sin(x)
+  correct:
+    drift:
+      epsilon: 1
+      u_coeff: 1
+      u3_coeff: -1
+    diffusion:
+      sigma: 1
+  discovered:
+    drift:
+      sigma_squared: -0.000454
+      sigma_squared_variance: 8.81e-06
+      u_coeff: 1.017037
+      u_coeff_variance: 0.00167741
+      u2_coeff: 0.32696
+      u2_coeff_variance: 0.34090295
+      u3_coeff: -1.051619
+      u3_coeff_variance: 0.00801726
+      uu_x_coeff: 0.997616
+      uu_x_coeff_variance: 0.00030223
+      epsilon: 0.997616
+      epsilon_variance: 0.00030223
+    diffusion:
+      sigma_squared: 0.971326
+      sigma_squared_variance: 1.41e-06
+      uu_x_coeff: 0.011694
+      uu_x_coeff_variance: 0.00020489
+      u_coeff: 0.014785
+      u_coeff_variance: 0.00010536
+      u3_coeff: -0.064761
+      u3_coeff_variance: 0.00012688
+      u2_coeff: -0.01321
+      u2_coeff_variance: 8.66e-06
+nagumo:
+  initial_condition: cos(x)
+  correct:
+    drift:
+      epsilon: 1
+      alpha: -0.5
+      u_coeff: 0.5
+      u2_coeff: 0.5
+      u3_coeff: -1
+    diffusion:
+      sigma: 1
+  discovered:
+    drift:
+      sigma_squared: -0.0074
+      sigma_squared_variance: 6.429e-05
+      u_coeff: 0.495845
+      u_coeff_variance: 0.00241619
+      u2_coeff: 0.53828
+      u2_coeff_variance: 0.00216069
+      u3_coeff: -1.030527
+      u3_coeff_variance: 0.01812685
+      epsilon: 0.971944
+      epsilon_variance: 0.00037382
+      uu_x_coeff: 0.971944
+      uu_x_coeff_variance: 0.00037382
+      u_xxx_coeff: 0.060767
+      u_xxx_coeff_variance: 0.00068133
+    diffusion:
+      sigma_squared: 0.971206
+      sigma_squared_variance: 1.25e-06
+      u2_coeff: 0.017815
+      u2_coeff_variance: 0.00152504
+      uu_x_coeff: 0.012897
+      uu_x_coeff_variance: 0.00018465
+      u_coeff: -0.012238
+      u_coeff_variance: 0.00014156
+      u3_coeff: 0.031985
+      u3_coeff_variance: 0.00765001
+burgers:
+  initial_condition: sin(x)
+  correct:
+    drift:
+      epsilon: 0.5
+      uu_x_coeff: 3
+    diffusion:
+      sigma: 1
+      u_coeff: 1
+  discovered:
+    drift:
+      sigma_squared: -0.00139
+      sigma_squared_variance: 8.72e-06
+      uu_x_coeff: 3.011385
+      uu_x_coeff_variance: 0.00262474
+      epsilon: 0.505197
+      epsilon_variance: 9.841e-05
+    diffusion:
+      sigma_squared: 0.982016
+      sigma_squared_variance: 8.8e-07
+      u_coeff: 1.960125
+      u_coeff_variance: 6.73e-06
+      u2_coeff: 0.982892
+      u2_coeff_variance: 1.704e-05
+      u3_coeff: 0.015662
+      u3_coeff_variance: 1.745e-05
