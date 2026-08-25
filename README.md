@@ -21,7 +21,8 @@ The following are original contributions:
   via DifferentialEquations.jl for all five problems (Heat, Allen-Cahn, Nagumo,
   KdV, Burgers), including the multiplicative-noise Burgers formulation.
 - `MasterNotebook.ipynb`: the full identification and prediction pipeline,
-  sweep infrastructure, and result logging.
+  sweep infrastructure, and result logging. Some code adapts from 1D_{problem}.ipynb 
+  files in the code of Mathpati et al. (2024).
 - `ormerodAlgorithm2` in `SPDE.py`: two-phase coordinate-ascent model
   selection wrapper, including parallelised ELBO evaluation.
 - `SolverDiagnostics.py`: KM diffusion convergence study.
