@@ -18,75 +18,26 @@ from scipy.special import loggamma
 from joblib import Parallel, delayed
 
 
-def sindy(lam, D, dxdt, iteration=10):
-    Xi = np.matmul(np.linalg.pinv(D), dxdt.T)  # initial guess: Least-squares
+def stridge(lam, D, dxdt, alpha=0.1, iteration=10):
+    # Initial guess: ridge regression
+    Xi = np.linalg.solve(D.T @ D + alpha * np.eye(D.shape[1]), D.T @ dxdt.T)
     for k in range(iteration):
-        smallinds = np.where(abs(Xi) < lam)  # find small coefficients
+        # Find coefficients below threshold
+        smallinds = np.where(np.abs(Xi) < lam)
         Xi[smallinds] = 0
+
         for ind in range(Xi.shape[1]):
-            biginds = np.where(abs(Xi[:, ind]) > lam)
-            # Regress dynamics onto remaining terms to find sparse Xi
-            Xi[biginds, ind] = np.matmul(
-                np.linalg.pinv(D[:, biginds[0]]), dxdt[ind, :].T
+            # Terms that survived thresholding
+            biginds = np.where(np.abs(Xi[:, ind]) >= lam)[0]
+            if len(biginds) == 0:
+                continue
+            # Ridge regression onto remaining terms
+            D_big = D[:, biginds]
+            Xi[biginds, ind] = np.linalg.solve(
+                D_big.T @ D_big + alpha * np.eye(len(biginds)), D_big.T @ dxdt[ind, :].T
             )
+
     return Xi
-
-
-def Lasso(X0, Y, lam, w=None, maxit=100, normalize=2):
-    """
-    Accelerated proximal gradient (FISTA) solver for Lasso
-
-    Minimises:
-        (1/2)||X w - Y||_2^2 + lam ||w||_1
-    """
-
-    # sizes
-    n, d = X0.shape
-
-    # ---- force NumPy-friendly vector shapes ----
-    Y = Y.reshape(n)  # 1D vector (NOT column vector)
-
-    if w is None or w.size != d:
-        w = np.zeros(d, dtype=np.complex64)
-    w_old = np.zeros(d, dtype=np.complex64)
-
-    X = np.zeros((n, d), dtype=np.complex64)
-
-    # ---- column normalisation ----
-    if normalize != 0:
-        Mreg = np.zeros(d)
-        for i in range(d):
-            Mreg[i] = 1.0 / np.linalg.norm(X0[:, i], normalize)
-            X[:, i] = Mreg[i] * X0[:, i]
-    else:
-        X = X0.copy()
-
-    # Lipschitz constant of gradient
-    L = np.linalg.norm(X.T @ X, 2)
-
-    # ---- FISTA loop ----
-    for k in range(maxit):
-
-        # momentum step
-        z = w + (k / (k + 1)) * (w - w_old)
-        w_old = w.copy()
-
-        # gradient step
-        z = z - (X.T @ (X @ z - Y)) / L
-
-        # soft threshold (prox operator) — vectorised
-        w = np.sign(z) * np.maximum(np.abs(z) - lam / L, 0)
-
-    # ---- debias using least squares on support ----
-    biginds = np.where(w != 0)[0]
-    if len(biginds) > 0:
-        w[biginds] = np.linalg.lstsq(X[:, biginds], Y, rcond=None)[0]
-
-    # ---- undo normalisation ----
-    if normalize != 0:
-        return Mreg * w
-    else:
-        return w
 
 
 def FiniteDiff(u, dx, d, periodic=False):
