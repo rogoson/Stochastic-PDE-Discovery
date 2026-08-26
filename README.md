@@ -28,5 +28,5 @@ The following are original contributions:
 - `SolverDiagnostics.py`: KM diffusion convergence study.
 - All figures in `worthwhileImages/` and result CSVs in `results/`.
 
-The original repository did not carry an explicit license file; attribution is
+The original repository did not carry a signed license file; attribution is
 provided above in accordance with academic practice.
