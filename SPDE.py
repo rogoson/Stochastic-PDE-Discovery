@@ -1,14 +1,10 @@
 """
-This is the utility file which contains usefull functions for:
-    1. The Bayes regression,
-    2. Lasso regression,
-    3. SINDy,
-    4. Building library,
-    5. Differentiation.
-
-Paper: Discovering stochastic partial differential equations fromlimited data
-       using variational Bayes inference.
+Parts of code inherited from paper: "Discovering stochastic partial differential equations fromlimited data
+       using variational Bayes inference."
        - Yogesh Chandrakant Mathpati, Tapas Tripura, Rajdip Nayek, Souvik Chakraborty
+Code for:
+       Dissertation code for "Collinearity as a Barrier to Sparse Discovery of Stochastic PDEs: Mechanisms, Mitigations, and Limits".
+       - Richard Pogoson
 """
 
 import numpy as np
